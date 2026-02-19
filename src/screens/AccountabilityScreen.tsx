@@ -76,16 +76,16 @@ export default function AccountabilityScreen() {
   const revokedPartners = partners.filter((p) => p.status === 'revoked');
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50" edges={['bottom']}>
+    <SafeAreaView className="flex-1 bg-warm-50" edges={['bottom']}>
       <ScrollView className="flex-1 px-4 pt-6 pb-12">
         {loading ? (
-          <Text className="text-gray-500 text-center mt-8">Loading...</Text>
+          <Text className="text-warm-400 text-center mt-8">Loading...</Text>
         ) : partners.length === 0 ? (
           <View className="items-center mt-12">
-            <Text className="text-lg font-semibold text-gray-800 mb-2">
+            <Text className="text-lg font-semibold text-warm-700 mb-2">
               No Partners Yet
             </Text>
-            <Text className="text-gray-500 text-center">
+            <Text className="text-warm-400 text-center">
               Share your invite link from Settings to add accountability
               partners.
             </Text>
@@ -94,17 +94,17 @@ export default function AccountabilityScreen() {
           <>
             {activePartners.length > 0 && (
               <>
-                <Text className="text-sm font-medium text-gray-500 uppercase mb-2">
+                <Text className="text-sm font-medium text-warm-400 uppercase mb-2">
                   Active Partners
                 </Text>
                 {activePartners.map((partner) => (
                   <Card key={partner.id} className="mb-3">
                     <View className="flex-row items-center justify-between">
                       <View>
-                        <Text className="text-base font-semibold text-gray-800">
+                        <Text className="text-base font-semibold text-warm-700">
                           {partner.partner_profile?.display_name ?? 'Partner'}
                         </Text>
-                        <Text className="text-sm text-gray-500">
+                        <Text className="text-sm text-warm-400">
                           {partner.partner_profile?.email}
                         </Text>
                       </View>
@@ -122,12 +122,12 @@ export default function AccountabilityScreen() {
 
             {revokedPartners.length > 0 && (
               <>
-                <Text className="text-sm font-medium text-gray-500 uppercase mb-2 mt-6">
+                <Text className="text-sm font-medium text-warm-400 uppercase mb-2 mt-6">
                   Revoked
                 </Text>
                 {revokedPartners.map((partner) => (
                   <Card key={partner.id} className="mb-3 opacity-50">
-                    <Text className="text-base text-gray-600">
+                    <Text className="text-base text-warm-500">
                       {partner.partner_profile?.display_name ?? 'Partner'}
                     </Text>
                   </Card>

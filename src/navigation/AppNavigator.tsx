@@ -4,6 +4,8 @@ import { TabNavigator } from './TabNavigator';
 import PaywallScreen from '@/src/screens/PaywallScreen';
 import AccountabilityScreen from '@/src/screens/AccountabilityScreen';
 import ContentDetailScreen from '@/src/screens/ContentDetailScreen';
+import CravingSOSScreen from '@/src/screens/CravingSOSScreen';
+import ArticlesScreen from '@/src/screens/ArticlesScreen';
 
 const Stack = createNativeStackNavigator<AppStackParamList>();
 
@@ -24,7 +26,17 @@ export function AppNavigator() {
       <Stack.Screen
         name="ContentDetail"
         component={ContentDetailScreen}
-        options={{ headerShown: true, title: 'Content' }}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CravingSOS"
+        component={CravingSOSScreen}
+        options={{ presentation: 'modal', headerShown: false }}
+      />
+      <Stack.Screen
+        name="Articles"
+        component={ArticlesScreen}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );

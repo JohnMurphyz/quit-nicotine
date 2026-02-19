@@ -41,16 +41,16 @@ export default function SignupScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-warm-50">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className="flex-1 justify-center px-6"
       >
         <View className="mb-8">
-          <Text className="text-3xl font-bold text-gray-900 mb-2">
+          <Text className="text-3xl font-bold text-warm-800 mb-2">
             Start Your Journey
           </Text>
-          <Text className="text-base text-gray-500">
+          <Text className="text-base text-warm-400">
             Create an account to begin tracking your nicotine-free days.
           </Text>
         </View>
@@ -91,9 +91,9 @@ export default function SignupScreen() {
         />
 
         <View className="flex-row justify-center mt-6">
-          <Text className="text-gray-500">Already have an account? </Text>
+          <Text className="text-warm-400">Already have an account? </Text>
           <Pressable onPress={() => navigation.navigate('Login')}>
-            <Text className="text-primary-600 font-semibold">Sign In</Text>
+            <Text className="text-warm-700 font-semibold">Sign In</Text>
           </Pressable>
         </View>
       </KeyboardAvoidingView>

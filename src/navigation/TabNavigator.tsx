@@ -1,11 +1,15 @@
+import { useRef, useEffect } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import type { TabParamList } from './types';
 import { PaywallGate } from '@/src/components/PaywallGate';
 import { useAuthStore } from '@/src/stores/authStore';
+import { useOnboardingStore } from '@/src/stores/onboardingStore';
+import { useThemeColors } from '@/src/hooks/useThemeColors';
 import { GuestStreakView } from '@/src/components/GuestStreakView';
 import HomeScreen from '@/src/screens/tabs/HomeScreen';
-import ProgressScreen from '@/src/screens/tabs/ProgressScreen';
+import TimelineScreen from '@/src/screens/tabs/TimelineScreen';
+import JournalScreen from '@/src/screens/tabs/JournalScreen';
 import ContentScreen from '@/src/screens/tabs/ContentScreen';
 import SettingsScreen from '@/src/screens/tabs/SettingsScreen';
 
@@ -13,6 +17,13 @@ const Tab = createBottomTabNavigator<TabParamList>();
 
 export function TabNavigator() {
   const { profile } = useAuthStore();
+  const initialTab = useRef(useOnboardingStore.getState().initialTab).current;
+  const colors = useThemeColors();
+
+  // Clear the flag after mount so future mounts default to Home
+  useEffect(() => {
+    useOnboardingStore.getState().clearInitialTab();
+  }, []);
 
   if (profile?.role === 'guest' && profile.linked_to) {
     return (
@@ -26,13 +37,17 @@ export function TabNavigator() {
   return (
     <PaywallGate>
       <Tab.Navigator
+        initialRouteName={initialTab}
         screenOptions={{
-          tabBarActiveTintColor: '#16a34a',
-          tabBarInactiveTintColor: '#9ca3af',
+          tabBarActiveTintColor: colors.tabBarActive,
+          tabBarInactiveTintColor: colors.tabBarInactive,
           headerShown: false,
+          tabBarShowLabel: false,
           tabBarStyle: {
+            backgroundColor: colors.tabBarBg,
             borderTopWidth: 1,
-            borderTopColor: '#f3f4f6',
+            borderTopColor: colors.tabBarBorder,
+            paddingTop: 8,
           },
         }}
       >
@@ -41,38 +56,45 @@ export function TabNavigator() {
           component={HomeScreen}
           options={{
             title: 'Home',
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="home" size={size} color={color} />
+            tabBarIcon: ({ color }) => (
+              <Ionicons name="home" size={28} color={color} />
             ),
           }}
         />
         <Tab.Screen
-          name="Progress"
-          component={ProgressScreen}
+          name="Timeline"
+          component={TimelineScreen}
           options={{
-            title: 'Progress',
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="calendar" size={size} color={color} />
+            title: 'Timeline',
+            tabBarIcon: ({ color }) => (
+              <Ionicons name="stats-chart" size={28} color={color} />
             ),
           }}
         />
         <Tab.Screen
-          name="Content"
+          name="Journal"
+          component={JournalScreen}
+          options={{
+            tabBarItemStyle: { display: 'none' },
+          }}
+        />
+        <Tab.Screen
+          name="Learn"
           component={ContentScreen}
           options={{
-            title: 'Content',
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="book" size={size} color={color} />
+            title: 'Learn',
+            tabBarIcon: ({ color }) => (
+              <Ionicons name="library" size={28} color={color} />
             ),
           }}
         />
         <Tab.Screen
-          name="Settings"
+          name="Profile"
           component={SettingsScreen}
           options={{
-            title: 'Settings',
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="settings" size={size} color={color} />
+            title: 'Profile',
+            tabBarIcon: ({ color }) => (
+              <Ionicons name="person" size={28} color={color} />
             ),
           }}
         />

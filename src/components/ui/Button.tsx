@@ -8,17 +8,17 @@ interface ButtonProps extends PressableProps {
 }
 
 const variantStyles = {
-  primary: 'bg-primary-600 active:bg-primary-700',
-  secondary: 'bg-gray-600 active:bg-gray-700',
-  outline: 'border-2 border-primary-600 bg-transparent active:bg-primary-50',
-  ghost: 'bg-transparent active:bg-gray-100',
+  primary: 'bg-warm-700 active:bg-warm-800',
+  secondary: 'bg-warm-500 active:bg-warm-600',
+  outline: 'border-2 border-warm-700 bg-transparent active:bg-warm-100',
+  ghost: 'bg-transparent active:bg-warm-100',
 };
 
 const variantTextStyles = {
   primary: 'text-white',
   secondary: 'text-white',
-  outline: 'text-primary-600',
-  ghost: 'text-primary-600',
+  outline: 'text-warm-700',
+  ghost: 'text-warm-700',
 };
 
 const sizeStyles = {
@@ -43,7 +43,7 @@ export function Button({
 }: ButtonProps) {
   return (
     <Pressable
-      className={`rounded-xl items-center justify-center flex-row ${variantStyles[variant]} ${sizeStyles[size]} ${
+      className={`rounded-2xl items-center justify-center flex-row ${variantStyles[variant]} ${sizeStyles[size]} ${
         disabled || loading ? 'opacity-50' : ''
       }`}
       disabled={disabled || loading}
@@ -52,7 +52,7 @@ export function Button({
       {loading && (
         <ActivityIndicator
           size="small"
-          color={variant === 'primary' || variant === 'secondary' ? '#fff' : '#16a34a'}
+          color={variant === 'primary' || variant === 'secondary' ? '#fff' : '#4a3f33'}
           className="mr-2"
         />
       )}

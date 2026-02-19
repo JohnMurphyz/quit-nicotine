@@ -6,8 +6,9 @@ export const linking: LinkingOptions<RootStackParamList> = {
   prefixes: [Linking.createURL('/'), 'quitnicotine://'],
   config: {
     screens: {
-      Auth: {
+      Onboarding: {
         screens: {
+          Welcome: 'onboarding',
           Invite: 'invite/:code',
         },
       },
@@ -16,14 +17,15 @@ export const linking: LinkingOptions<RootStackParamList> = {
           Tabs: {
             screens: {
               Home: '',
-              Progress: 'progress',
-              Content: 'content',
+              Timeline: 'timeline',
+              Journal: 'journal',
               Settings: 'settings',
             },
           },
           Accountability: 'accountability',
           ContentDetail: 'content/:slug',
           Paywall: 'paywall',
+          CravingSOS: 'sos',
         },
       },
     },

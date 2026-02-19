@@ -6,15 +6,18 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthStore } from '@/src/stores/authStore';
 import { Button } from '@/src/components/ui/Button';
 import { Input } from '@/src/components/ui/Input';
-import type { AuthStackParamList } from '@/src/navigation/types';
+import type { OnboardingStackParamList } from '@/src/navigation/types';
 
-type Nav = NativeStackNavigationProp<AuthStackParamList, 'Login'>;
+type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'Login'>;
+
+const DEV_EMAIL = 'test@quitnicotine.dev';
+const DEV_PASSWORD = 'testtest123';
 
 export default function LoginScreen() {
   const navigation = useNavigation<Nav>();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { signIn, loading } = useAuthStore();
+  const { signIn, signUp, loading } = useAuthStore();
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -29,17 +32,30 @@ export default function LoginScreen() {
     }
   };
 
+  const handleDevSignIn = async () => {
+    try {
+      await signIn(DEV_EMAIL, DEV_PASSWORD);
+    } catch {
+      // Account doesn't exist yet — create it
+      try {
+        await signUp(DEV_EMAIL, DEV_PASSWORD, 'Test User');
+      } catch (error: any) {
+        Alert.alert('Dev Sign In Failed', error.message ?? 'Something went wrong.');
+      }
+    }
+  };
+
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-warm-50">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className="flex-1 justify-center px-6"
       >
         <View className="mb-8">
-          <Text className="text-3xl font-bold text-gray-900 mb-2">
+          <Text className="text-3xl font-bold text-warm-800 mb-2">
             Welcome Back
           </Text>
-          <Text className="text-base text-gray-500">
+          <Text className="text-base text-warm-400">
             Sign in to continue your nicotine-free journey.
           </Text>
         </View>
@@ -71,11 +87,26 @@ export default function LoginScreen() {
         />
 
         <View className="flex-row justify-center mt-6">
-          <Text className="text-gray-500">Don't have an account? </Text>
-          <Pressable onPress={() => navigation.navigate('Signup')}>
-            <Text className="text-primary-600 font-semibold">Sign Up</Text>
+          <Text className="text-warm-400">Don't have an account? </Text>
+          <Pressable onPress={() => navigation.navigate('Welcome')}>
+            <Text className="text-warm-700 font-semibold">Get Started</Text>
           </Pressable>
         </View>
+
+        {__DEV__ && (
+          <View className="mt-8 pt-6 border-t border-warm-200">
+            <Button
+              title="Dev Sign In"
+              variant="ghost"
+              size="sm"
+              onPress={handleDevSignIn}
+              loading={loading}
+            />
+            <Text className="text-xs text-warm-400 text-center mt-1">
+              {DEV_EMAIL}
+            </Text>
+          </View>
+        )}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

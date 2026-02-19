@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { Platform } from 'react-native';
 import { supabase } from '@/src/lib/supabase';
 import type { SubscriptionStatus } from '@/src/types';
 
@@ -15,7 +14,7 @@ interface SubscriptionState {
   purchaseWeb: (userId: string, priceId: string) => Promise<void>;
 }
 
-export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
+export const useSubscriptionStore = create<SubscriptionState>((set) => ({
   status: 'none',
   loading: false,
   isActive: false,
@@ -45,38 +44,16 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
     set({ status, isActive: status === 'active' || status === 'trial' });
   },
 
+  // TODO: Re-enable when RevenueCat is configured
   restorePurchases: async () => {
-    if (Platform.OS === 'web') return;
-
-    set({ loading: true });
-    try {
-      const { restorePurchases } = await import('@/src/lib/revenueCat');
-      await restorePurchases();
-    } finally {
-      set({ loading: false });
-    }
+    console.warn('Purchases not configured yet');
   },
 
-  purchaseMobile: async (packageId) => {
-    set({ loading: true });
-    try {
-      const { purchasePackage } = await import('@/src/lib/revenueCat');
-      const isActive = await purchasePackage(packageId);
-      if (isActive) {
-        set({ status: 'active', isActive: true });
-      }
-    } finally {
-      set({ loading: false });
-    }
+  purchaseMobile: async () => {
+    console.warn('Purchases not configured yet');
   },
 
-  purchaseWeb: async (userId, priceId) => {
-    set({ loading: true });
-    try {
-      const { createCheckoutSession } = await import('@/src/lib/stripe');
-      await createCheckoutSession(userId, priceId);
-    } finally {
-      set({ loading: false });
-    }
+  purchaseWeb: async () => {
+    console.warn('Purchases not configured yet');
   },
 }));

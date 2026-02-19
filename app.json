@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Quit Nicotine",
+    "name": "FREED",
     "slug": "quit-nicotine",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -43,7 +43,8 @@
           "color": "#22c55e"
         }
       ],
-      "expo-localization"
+      "expo-localization",
+      "expo-font"
     ],
     "extra": {
       "eas": {

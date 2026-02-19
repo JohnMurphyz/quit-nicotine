@@ -9,6 +9,7 @@ interface AuthState {
   profile: Profile | null;
   loading: boolean;
   initialized: boolean;
+  isAnonymous: boolean;
 
   setSession: (session: Session | null) => void;
   fetchProfile: () => Promise<void>;
@@ -16,6 +17,8 @@ interface AuthState {
   signUp: (email: string, password: string, displayName?: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  signInAnonymously: () => Promise<void>;
+  upgradeAnonymousAccount: (email: string, password: string) => Promise<void>;
   initialize: () => Promise<void>;
 }
 
@@ -25,9 +28,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   profile: null,
   loading: false,
   initialized: false,
+  isAnonymous: false,
 
   setSession: (session) => {
-    set({ session, user: session?.user ?? null });
+    set({ session, user: session?.user ?? null, isAnonymous: session?.user?.is_anonymous ?? false });
   },
 
   fetchProfile: async () => {
@@ -97,13 +101,40 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   signOut: async () => {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
-    set({ session: null, user: null, profile: null });
+    set({ session: null, user: null, profile: null, isAnonymous: false });
+  },
+
+  signInAnonymously: async () => {
+    set({ loading: true });
+    try {
+      const { error } = await supabase.auth.signInAnonymously();
+      if (error) throw error;
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  upgradeAnonymousAccount: async (email, password) => {
+    set({ loading: true });
+    try {
+      const { error } = await supabase.auth.updateUser({ email, password });
+      if (error) throw error;
+      await get().fetchProfile();
+      set({ isAnonymous: false });
+    } finally {
+      set({ loading: false });
+    }
   },
 
   initialize: async () => {
     const { data } = await supabase.auth.getSession();
     const session = data.session;
-    set({ session, user: session?.user ?? null, initialized: true });
+    set({
+      session,
+      user: session?.user ?? null,
+      isAnonymous: session?.user?.is_anonymous ?? false,
+      initialized: true,
+    });
 
     if (session?.user) {
       await get().fetchProfile();

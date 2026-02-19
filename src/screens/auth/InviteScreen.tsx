@@ -15,10 +15,10 @@ import { supabase } from '@/src/lib/supabase';
 import { useAuthStore } from '@/src/stores/authStore';
 import { Button } from '@/src/components/ui/Button';
 import { Input } from '@/src/components/ui/Input';
-import type { AuthStackParamList } from '@/src/navigation/types';
+import type { OnboardingStackParamList } from '@/src/navigation/types';
 
-type Nav = NativeStackNavigationProp<AuthStackParamList, 'Invite'>;
-type InviteRoute = RouteProp<AuthStackParamList, 'Invite'>;
+type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'Invite'>;
+type InviteRoute = RouteProp<OnboardingStackParamList, 'Invite'>;
 
 export default function InviteScreen() {
   const navigation = useNavigation<Nav>();
@@ -96,7 +96,7 @@ export default function InviteScreen() {
         status: 'active',
       });
 
-      // Auth state listener in useAuth will auto-navigate to App stack
+      // Auth state listener will auto-navigate to App stack
     } catch (error: any) {
       Alert.alert('Signup Failed', error.message ?? 'Something went wrong.');
     }
@@ -104,20 +104,20 @@ export default function InviteScreen() {
 
   if (loadingInvite) {
     return (
-      <SafeAreaView className="flex-1 bg-white items-center justify-center">
-        <ActivityIndicator size="large" color="#16a34a" />
-        <Text className="text-gray-500 mt-4">Loading invite...</Text>
+      <SafeAreaView className="flex-1 bg-warm-50 items-center justify-center">
+        <ActivityIndicator size="large" color="#8c7a66" />
+        <Text className="text-warm-400 mt-4">Loading invite...</Text>
       </SafeAreaView>
     );
   }
 
   if (!inviterUserId) {
     return (
-      <SafeAreaView className="flex-1 bg-white items-center justify-center px-6">
-        <Text className="text-xl font-bold text-gray-900 mb-2">
+      <SafeAreaView className="flex-1 bg-warm-50 items-center justify-center px-6">
+        <Text className="text-xl font-bold text-warm-800 mb-2">
           Invalid Invite
         </Text>
-        <Text className="text-gray-500 text-center mb-6">
+        <Text className="text-warm-400 text-center mb-6">
           This invite link is invalid or has expired.
         </Text>
         <Button
@@ -129,16 +129,16 @@ export default function InviteScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-warm-50">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className="flex-1 justify-center px-6"
       >
         <View className="mb-8">
-          <Text className="text-3xl font-bold text-gray-900 mb-2">
+          <Text className="text-3xl font-bold text-warm-800 mb-2">
             You're Invited!
           </Text>
-          <Text className="text-base text-gray-500">
+          <Text className="text-base text-warm-400">
             {inviterName ?? 'Someone'} wants you to be their accountability
             partner. Sign up to track their nicotine-free progress.
           </Text>
