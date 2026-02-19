@@ -34,12 +34,14 @@ export interface Profile {
   daily_cost: number | null;
   quit_date: string | null;
   motivations: string[] | null;
+  tracked_symptoms: string[] | null;
   wants_lecture: boolean | null;
   readiness_level: number | null;
   destroyed_products: boolean | null;
   acknowledged_law_of_addiction: boolean;
   specific_benefit: string | null;
   support_person: string | null;
+  avatar_url: string | null;
   onboarding_completed: boolean;
   created_at: string;
   updated_at: string;

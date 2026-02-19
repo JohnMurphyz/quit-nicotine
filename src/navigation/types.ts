@@ -37,6 +37,7 @@ export type AppStackParamList = {
   ContentDetail: { slug: string };
   CravingSOS: undefined;
   Articles: undefined;
+  Settings: undefined;
 };
 
 export type RootStackParamList = {

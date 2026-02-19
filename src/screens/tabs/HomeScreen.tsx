@@ -21,6 +21,13 @@ import { MoreSheet } from '@/src/components/MoreSheet';
 import { AnimatedSkyBackground } from '@/src/components/AnimatedSkyBackground';
 import { BreathingOrb } from '@/src/components/BreathingOrb';
 import { FlameIcon } from '@/src/components/FlameIcon';
+import { BenefitSelectorModal } from '@/src/components/BenefitSelectorModal';
+import { SymptomSelectorModal } from '@/src/components/SymptomSelectorModal';
+import { StreakCelebrationModal } from '@/src/components/StreakCelebrationModal';
+import { HomeTodoCard } from '@/src/components/HomeTodoCard';
+import { HomeMainCard } from '@/src/components/HomeMainCard';
+import { useNotifications } from '@/src/hooks/useNotifications';
+import { useJournal } from '@/src/hooks/useJournal';
 import type { AppStackParamList, TabParamList } from '@/src/navigation/types';
 
 type Nav = CompositeNavigationProp<
@@ -35,12 +42,21 @@ export default function HomeScreen() {
   const { logCraving, logging } = useCravings();
   const { isCheckInDue, recordCheckIn, resetCheckIn } = useCheckInInterval();
   const colors = useThemeColors();
+  const { enabled: notificationsEnabled, requestPermission } = useNotifications();
+  const { entries } = useJournal();
   const [now, setNow] = useState(new Date());
 
   const [cravingModalVisible, setCravingModalVisible] = useState(false);
   const [pledgeModalVisible, setPledgeModalVisible] = useState(false);
   const [meditateModalVisible, setMeditateModalVisible] = useState(false);
   const [moreSheetVisible, setMoreSheetVisible] = useState(false);
+  const [benefitSelectorVisible, setBenefitSelectorVisible] = useState(false);
+  const [symptomSelectorVisible, setSymptomSelectorVisible] = useState(false);
+  const [streakCelebrationVisible, setStreakCelebrationVisible] = useState(false);
+  const [celebrationStreak, setCelebrationStreak] = useState(0);
+
+  const motivations = profile?.motivations ?? [];
+  const trackedSymptoms = profile?.tracked_symptoms ?? [];
 
   const alreadyPledged = !isCheckInDue;
 
@@ -60,9 +76,14 @@ export default function HomeScreen() {
   }, [profile?.quit_date, now]);
 
   const handlePledge = useCallback(async () => {
+    const newStreak = (streak?.current_streak ?? 0) + 1;
     await recordCheckIn();
     confirmToday();
-  }, [recordCheckIn, confirmToday]);
+    if (newStreak >= 3) {
+      setCelebrationStreak(newStreak);
+      setStreakCelebrationVisible(true);
+    }
+  }, [recordCheckIn, confirmToday, streak?.current_streak]);
 
   const handleReset = useCallback(() => {
     Alert.alert(
@@ -154,6 +175,33 @@ export default function HomeScreen() {
 
         {/* Action buttons */}
         <ActionButtonRow buttons={actionButtons} />
+
+        {/* To-do checklist */}
+        {profile && (
+          <HomeTodoCard
+            profile={profile}
+            notificationsEnabled={notificationsEnabled}
+            hasJournalEntries={entries.length > 0}
+            onSetGoals={() => setBenefitSelectorVisible(true)}
+            onTrackSymptoms={() => setSymptomSelectorVisible(true)}
+            onEnableNotifications={requestPermission}
+            onAddPartner={() => navigation.navigate('Accountability')}
+            onDestroyProducts={() => navigation.navigate('Settings')}
+            onWriteJournal={() => navigation.navigate('Journal')}
+          />
+        )}
+
+        {/* Main navigation */}
+        <HomeMainCard
+          onNavigate={(screen) => {
+            const tabScreens = ['Journal', 'Learn', 'Timeline'];
+            if (tabScreens.includes(screen)) {
+              navigation.navigate('Tabs', { screen } as any);
+            } else {
+              (navigation.navigate as any)(screen);
+            }
+          }}
+        />
       </ScrollView>
 
       {/* Panic Button — pinned */}
@@ -195,6 +243,24 @@ export default function HomeScreen() {
         onLog={logCraving}
         onOpenSOS={() => { setCravingModalVisible(false); navigation.navigate('CravingSOS'); }}
         logging={logging}
+      />
+
+      <BenefitSelectorModal
+        visible={benefitSelectorVisible}
+        onClose={() => setBenefitSelectorVisible(false)}
+        initialSelections={motivations}
+      />
+
+      <SymptomSelectorModal
+        visible={symptomSelectorVisible}
+        onClose={() => setSymptomSelectorVisible(false)}
+        initialSelections={trackedSymptoms}
+      />
+
+      <StreakCelebrationModal
+        visible={streakCelebrationVisible}
+        onClose={() => setStreakCelebrationVisible(false)}
+        streakCount={celebrationStreak}
       />
     </SafeAreaView>
     </AnimatedSkyBackground>

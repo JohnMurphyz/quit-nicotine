@@ -6,6 +6,7 @@ import AccountabilityScreen from '@/src/screens/AccountabilityScreen';
 import ContentDetailScreen from '@/src/screens/ContentDetailScreen';
 import CravingSOSScreen from '@/src/screens/CravingSOSScreen';
 import ArticlesScreen from '@/src/screens/ArticlesScreen';
+import SettingsScreen from '@/src/screens/SettingsScreen';
 
 const Stack = createNativeStackNavigator<AppStackParamList>();
 
@@ -36,6 +37,11 @@ export function AppNavigator() {
       <Stack.Screen
         name="Articles"
         component={ArticlesScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Settings"
+        component={SettingsScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
