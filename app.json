@@ -19,7 +19,8 @@
       "infoPlist": {
         "UIBackgroundModes": [
           "remote-notification"
-        ]
+        ],
+        "NSPhotoLibraryUsageDescription": "Allow FREED to access your photos to set a profile picture."
       }
     },
     "android": {
@@ -41,6 +42,12 @@
         {
           "icon": "./assets/images/icon.png",
           "color": "#22c55e"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow FREED to access your photos to set a profile picture."
         }
       ],
       "expo-localization",

@@ -59,6 +59,9 @@ export interface AccountabilityPartner {
   user_id: string;
   partner_id: string;
   status: PartnerStatus;
+  share_pledges: boolean;
+  share_goals: boolean;
+  share_symptoms: boolean;
   created_at: string;
 }
 
@@ -94,7 +97,16 @@ export interface JournalEntry {
   id: string;
   user_id: string;
   mood: Mood;
+  title: string | null;
   content: string | null;
+  created_at: string;
+}
+
+export interface Reason {
+  id: string;
+  user_id: string;
+  content: string;
+  emoji: string;
   created_at: string;
 }
 

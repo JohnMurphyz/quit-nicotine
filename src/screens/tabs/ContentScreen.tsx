@@ -97,7 +97,7 @@ export default function ContentScreen() {
 
   return (
     <AnimatedSkyBackground>
-    <SafeAreaView className="flex-1">
+    <SafeAreaView className="flex-1" edges={['top']}>
       <ScrollView
         ref={scrollRef}
         className="flex-1 px-5 pt-6 pb-12"

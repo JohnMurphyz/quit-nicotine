@@ -8,7 +8,9 @@ interface JournalState {
   saving: boolean;
 
   fetchEntries: (userId: string) => Promise<void>;
-  addEntry: (userId: string, mood: Mood, content?: string) => Promise<void>;
+  addEntry: (userId: string, mood: Mood, title?: string, content?: string) => Promise<void>;
+  updateEntry: (entryId: string, updates: { title?: string; content?: string; mood?: Mood }) => Promise<void>;
+  deleteEntry: (entryId: string) => Promise<void>;
 }
 
 export const useJournalStore = create<JournalState>((set) => ({
@@ -36,7 +38,7 @@ export const useJournalStore = create<JournalState>((set) => ({
     }
   },
 
-  addEntry: async (userId, mood, content) => {
+  addEntry: async (userId, mood, title, content) => {
     set({ saving: true });
     try {
       const { data, error } = await supabase
@@ -44,6 +46,7 @@ export const useJournalStore = create<JournalState>((set) => ({
         .insert({
           user_id: userId,
           mood,
+          title: title || null,
           content: content || null,
         })
         .select()
@@ -57,6 +60,49 @@ export const useJournalStore = create<JournalState>((set) => ({
       set((s) => ({ entries: [data, ...s.entries] }));
     } finally {
       set({ saving: false });
+    }
+  },
+
+  updateEntry: async (entryId, updates) => {
+    set({ saving: true });
+    try {
+      const { data, error } = await supabase
+        .from('journal_entries')
+        .update(updates)
+        .eq('id', entryId)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error updating journal entry:', error);
+        throw error;
+      }
+
+      set((s) => ({
+        entries: s.entries.map((e) => (e.id === entryId ? data : e)),
+      }));
+    } finally {
+      set({ saving: false });
+    }
+  },
+
+  deleteEntry: async (entryId) => {
+    try {
+      const { error } = await supabase
+        .from('journal_entries')
+        .delete()
+        .eq('id', entryId);
+
+      if (error) {
+        console.error('Error deleting journal entry:', error);
+        throw error;
+      }
+
+      set((s) => ({
+        entries: s.entries.filter((e) => e.id !== entryId),
+      }));
+    } catch (e) {
+      throw e;
     }
   },
 }));

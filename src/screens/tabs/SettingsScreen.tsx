@@ -122,7 +122,7 @@ export default function ProfileScreen() {
 
   return (
     <AnimatedSkyBackground>
-      <SafeAreaView className="flex-1">
+      <SafeAreaView className="flex-1" edges={['top']}>
         {/* Header */}
         <View className="flex-row items-center justify-between px-5 pt-4 pb-2">
           <Text style={{ fontSize: 28, fontWeight: '800', color: colors.textPrimary }}>
@@ -447,14 +447,7 @@ export default function ProfileScreen() {
                 title="Reasons for Changing"
                 subtitle="Remind yourself why you are quitting"
                 colors={colors}
-                onPress={() => {
-                  const reasons = profile?.motivations;
-                  if (reasons && reasons.length > 0) {
-                    Alert.alert('Your Reasons', reasons.join('\n'));
-                  } else {
-                    Alert.alert('No reasons saved', 'Add your motivations in Settings.');
-                  }
-                }}
+                onPress={() => navigation.navigate('Reasons')}
               />
               <View style={{ height: 1, backgroundColor: colors.borderColor, marginHorizontal: 16 }} />
               <MenuRow
@@ -463,7 +456,7 @@ export default function ProfileScreen() {
                 title="Recovery Journal"
                 subtitle="Private notes to help you stay on track"
                 colors={colors}
-                onPress={() => navigation.navigate('Journal')}
+                onPress={() => navigation.navigate('JournalList')}
                 isLast
               />
             </View>

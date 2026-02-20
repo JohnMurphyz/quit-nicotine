@@ -13,10 +13,10 @@ export function useJournal() {
     }
   }, [user?.id]);
 
-  const addEntry = async (mood: Mood, content?: string) => {
+  const addEntry = async (mood: Mood, title?: string, content?: string) => {
     if (!user?.id) return;
     try {
-      await store.addEntry(user.id, mood, content);
+      await store.addEntry(user.id, mood, title, content);
     } catch (e) {
       console.warn('Could not add journal entry (table may not exist yet):', e);
     }

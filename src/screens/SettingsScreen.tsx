@@ -271,6 +271,42 @@ export default function SettingsScreen() {
             </Pressable>
           </View>
 
+          {/* Restart Onboarding */}
+          <View className="mt-6">
+            <Pressable
+              onPress={() => {
+                Alert.alert(
+                  'Restart Onboarding',
+                  'This will take you back through the setup process. Your data will be preserved.',
+                  [
+                    { text: 'Cancel', style: 'cancel' },
+                    {
+                      text: 'Restart',
+                      onPress: async () => {
+                        try {
+                          await updateProfile({ onboarding_completed: false });
+                        } catch (e: any) {
+                          Alert.alert('Error', e.message);
+                        }
+                      },
+                    },
+                  ],
+                );
+              }}
+              style={{
+                borderWidth: 1,
+                borderColor: colors.borderColor,
+                borderRadius: 12,
+                padding: 14,
+                alignItems: 'center',
+              }}
+            >
+              <Text style={{ fontSize: 15, fontWeight: '600', color: colors.textSecondary }}>
+                Restart Onboarding
+              </Text>
+            </Pressable>
+          </View>
+
           {/* Danger Zone */}
           <View className="mt-8">
             <Pressable onPress={handleDeleteAccount} className="py-3">

@@ -16,11 +16,18 @@ interface MainItem {
 
 const ITEMS: MainItem[] = [
   {
+    icon: 'heart-outline',
+    color: '#ef4444',
+    title: 'Reasons for Change',
+    description: 'Remember why you started',
+    screen: 'Reasons',
+  },
+  {
     icon: 'book-outline',
     color: '#f59e0b',
     title: 'Journal',
     description: 'Reflect on your quit journey',
-    screen: 'Journal',
+    screen: 'JournalList',
   },
   {
     icon: 'library-outline',

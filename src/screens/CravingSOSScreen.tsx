@@ -1,32 +1,55 @@
-import { View, Text, ScrollView, Pressable } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useState, useEffect, useRef } from 'react';
-import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { AnimatedSkyBackground } from '@/src/components/AnimatedSkyBackground';
+import { BreathingExercise } from '@/src/components/BreathingExercise';
+import { getDailyAffirmation } from '@/src/constants/affirmations';
+import { getBenefitsForMotivations } from '@/src/constants/benefits';
+import { useThemeColors } from '@/src/hooks/useThemeColors';
 import { useAuthStore } from '@/src/stores/authStore';
 import { useCravingStore } from '@/src/stores/cravingStore';
-import { BreathingExercise } from '@/src/components/BreathingExercise';
-import { Button } from '@/src/components/ui/Button';
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { differenceInDays } from 'date-fns';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Alert, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const TIPS = [
-  { icon: 'water', text: 'Drink a glass of water' },
-  { icon: 'walk', text: 'Go for a short walk' },
-  { icon: 'call', text: 'Call someone you trust' },
-  { icon: 'nutrition', text: 'Chew gum or have a healthy snack' },
-  { icon: 'hand-left', text: 'Squeeze something — stress ball, pillow' },
-  { icon: 'musical-notes', text: 'Put on your favorite song' },
+  { icon: 'water-outline', text: 'Slowly drink a glass of freezing cold water' },
+  { icon: 'walk-outline', text: 'Stand up and change your environment' },
+  { icon: 'call-outline', text: 'Message someone you trust right now' },
+  { icon: 'fitness-outline', text: 'Do 10 deep squats or pushups' },
+  { icon: 'hand-left-outline', text: 'Squeeze a stress ball or pillow tightly' },
+  { icon: 'musical-notes-outline', text: 'Put on a song you know all the words to' },
 ];
 
 export default function CravingSOSScreen() {
   const navigation = useNavigation();
+  const colors = useThemeColors();
   const { user, profile } = useAuthStore();
   const { cravings, logCraving, markResisted } = useCravingStore();
+
   const [seconds, setSeconds] = useState(0);
   const [sosCravingId, setSosCravingId] = useState<string | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval>>(undefined);
 
+  // Pick ONE random grounding tip to show on this session to avoid list paralysis
+  const activeTip = useMemo(() => TIPS[Math.floor(Math.random() * TIPS.length)], []);
+
+  // Fetch the user's primary reason for quitting
+  const primaryGoal = useMemo(() => {
+    if (!profile?.motivations?.length) return null;
+    const allBenefits = getBenefitsForMotivations(profile.motivations);
+    return allBenefits.length > 0 ? allBenefits[0] : null;
+  }, [profile?.motivations]);
+
+  const daysSinceQuit = useMemo(() => {
+    if (!profile?.quit_date) return 0;
+    return differenceInDays(new Date(), new Date(profile.quit_date));
+  }, [profile?.quit_date]);
+
+  const affirmation = useMemo(() => getDailyAffirmation(daysSinceQuit), [daysSinceQuit]);
+
   useEffect(() => {
-    // Log an SOS craving on open
+    // Log an SOS craving immediately on open
     const log = async () => {
       if (!user?.id) return;
       await logCraving(user.id, { intensity: 8 });
@@ -43,7 +66,7 @@ export default function CravingSOSScreen() {
     };
   }, []);
 
-  // Capture the craving ID after logging
+  // Capture the assigned craving ID after logging so we can mark it 'resisted' when done
   useEffect(() => {
     if (!sosCravingId && cravings.length > 0) {
       setSosCravingId(cravings[0].id);
@@ -60,76 +83,178 @@ export default function CravingSOSScreen() {
     if (sosCravingId) {
       await markResisted(sosCravingId);
     }
-    navigation.goBack();
+
+    Alert.alert(
+      "You Did It! 🎉",
+      "Writing down how you got through this craving can help you build strength for the next one. Would you like to log a quick journal entry?",
+      [
+        {
+          text: "No, thanks",
+          style: "cancel",
+          onPress: () => navigation.goBack()
+        },
+        {
+          text: "Yes, let's journal",
+          onPress: () => {
+            // Rebuild the navigation state so they land in the Journal tab, 
+            // with the JournalEntry pushed on top of it.
+            (navigation as any).reset({
+              index: 1,
+              routes: [
+                {
+                  name: 'Tabs',
+                  state: { routes: [{ name: 'Journal' }] }
+                },
+                {
+                  name: 'JournalEntry',
+                  params: { initialTitle: 'SOS Note' }
+                },
+              ],
+            });
+          }
+        }
+      ]
+    );
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-warm-50">
-      <View className="flex-row items-center justify-between px-4 pt-2 pb-4">
-        <Text className="text-2xl font-bold text-warm-800">SOS Mode</Text>
-        <Pressable onPress={() => navigation.goBack()}>
-          <Ionicons name="close" size={28} color="#8c7a66" />
-        </Pressable>
-      </View>
-
-      <ScrollView className="flex-1 px-6" contentContainerClassName="pb-12">
-        {/* Breathing Exercise */}
-        <View className="items-center py-8">
-          <BreathingExercise />
+    <AnimatedSkyBackground>
+      <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+        {/* Header */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', paddingHorizontal: 20, paddingTop: 16 }}>
+          <Pressable
+            onPress={() => navigation.goBack()}
+            style={{
+              backgroundColor: colors.isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+              width: 40, height: 40, borderRadius: 20,
+              alignItems: 'center', justifyContent: 'center'
+            }}
+          >
+            <Ionicons name="close" size={24} color={colors.textPrimary} />
+          </Pressable>
         </View>
 
-        {/* Timer */}
-        <View className="bg-warm-200 rounded-2xl p-6 items-center mb-6">
-          <Text className="text-4xl font-bold text-warm-800 mb-2">
-            {formatTime(seconds)}
-          </Text>
-          <Text className="text-base text-warm-500 text-center">
-            This craving will pass. Average craving lasts 3-5 minutes.
-          </Text>
-        </View>
+        <ScrollView
+          style={{ flex: 1, paddingHorizontal: 24 }}
+          contentContainerStyle={{ paddingBottom: 120 }}
+          showsVerticalScrollIndicator={false}
+        >
 
-        {/* Quick Tips */}
-        <Text className="text-lg font-bold text-warm-800 mb-3">Try This</Text>
-        <View className="gap-2 mb-6">
-          {TIPS.map((tip) => (
-            <View
-              key={tip.text}
-              className="flex-row items-center bg-warm-100 rounded-xl p-3 border border-warm-200"
-            >
-              <Ionicons name={tip.icon as any} size={22} color="#8c7a66" />
-              <Text className="text-base text-warm-600 ml-3">{tip.text}</Text>
-            </View>
-          ))}
-        </View>
-
-        {/* Motivations */}
-        {profile?.motivations && profile.motivations.length > 0 && (
-          <View className="mb-6">
-            <Text className="text-lg font-bold text-warm-800 mb-3">
-              Remember Why
+          {/* Top Section: Reassurance */}
+          <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 20 }}>
+            <Text style={{ fontSize: 20, color: colors.textSecondary, marginBottom: 8, textAlign: 'center' }}>
+              You are stronger than this craving.
             </Text>
-            <View className="flex-row flex-wrap gap-2">
-              {profile.motivations.map((m) => (
-                <View key={m} className="bg-warm-200 px-4 py-2 rounded-full">
-                  <Text className="text-warm-700 font-medium">{m}</Text>
-                </View>
-              ))}
-            </View>
+            <Text style={{ fontSize: 56, fontWeight: '800', color: colors.textPrimary, letterSpacing: 2 }}>
+              {formatTime(seconds)}
+            </Text>
           </View>
-        )}
 
-        {/* Made it button */}
-        <View className="mt-4">
-          <Button
-            title="I made it through!"
-            size="lg"
-            onPress={handleMadeIt}
-          />
-          <Text className="text-sm text-warm-400 text-center mt-2">
-            This will be logged as a resisted craving
-          </Text>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+          {/* Core Feature: Immersive Breathing Exercise */}
+          <View style={{ alignItems: 'center', marginVertical: 20 }}>
+            <BreathingExercise />
+          </View>
+
+          {/* Bottom Action Area */}
+          <View style={{ gap: 16, marginTop: 40 }}>
+
+            {/* Primary Motivation (if exists) */}
+            {primaryGoal && (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  paddingHorizontal: 12,
+                  gap: 12
+                }}
+              >
+                <Text style={{ fontSize: 28 }}>{primaryGoal.icon}</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 13, textTransform: 'uppercase', fontWeight: '700', color: colors.textMuted, letterSpacing: 1 }}>
+                    Remember Why You Quit
+                  </Text>
+                  <Text style={{ fontSize: 18, color: colors.textPrimary, fontWeight: '600' }}>
+                    {primaryGoal.title}
+                  </Text>
+                </View>
+              </View>
+            )}
+
+            {/* Single Grounding Tip */}
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                backgroundColor: colors.isDark ? 'rgba(124, 58, 237, 0.15)' : 'rgba(124, 58, 237, 0.08)',
+                borderWidth: 1,
+                borderColor: colors.isDark ? 'rgba(124, 58, 237, 0.3)' : 'rgba(124, 58, 237, 0.2)',
+                borderRadius: 20,
+                padding: 16,
+                gap: 16
+              }}
+            >
+              <View style={{ backgroundColor: colors.isDark ? 'rgba(124, 58, 237, 0.3)' : 'rgba(124, 58, 237, 0.15)', padding: 12, borderRadius: 16 }}>
+                <Ionicons name={activeTip.icon as any} size={28} color={colors.isDark ? '#a78bfa' : '#7c3aed'} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 13, textTransform: 'uppercase', fontWeight: '700', color: colors.isDark ? '#a78bfa' : '#7c3aed', letterSpacing: 1, marginBottom: 4 }}>
+                  Grounding Action
+                </Text>
+                <Text style={{ fontSize: 16, color: colors.textPrimary, lineHeight: 22 }}>
+                  {activeTip.text}
+                </Text>
+              </View>
+            </View>
+
+            {/* Success Button */}
+            <TouchableOpacity
+              onPress={handleMadeIt}
+              activeOpacity={0.8}
+              style={{
+                backgroundColor: colors.textSecondary,
+                borderRadius: 16,
+                height: 64,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderWidth: 2,
+                borderColor: colors.textSecondary,
+              }}
+            >
+              <Text style={{ fontSize: 20, fontWeight: '800', color: colors.textPrimary, letterSpacing: 0.5 }}>
+                I made it through
+              </Text>
+            </TouchableOpacity>
+
+            <Text style={{ fontSize: 14, color: colors.textMuted, textAlign: 'center', fontStyle: 'italic', paddingHorizontal: 20 }}>
+              "{affirmation}"
+            </Text>
+
+            {/* Distraction Button */}
+            <TouchableOpacity
+              onPress={() => (navigation as any).navigate('Articles')}
+              activeOpacity={0.7}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 10,
+                height: 56,
+                borderRadius: 16,
+                borderWidth: 2,
+                borderColor: colors.isDark ? '#a78bfa' : '#7c3aed',
+                backgroundColor: colors.isDark ? 'rgba(124,58,237,0.12)' : 'rgba(124,58,237,0.07)',
+              }}
+            >
+              <Ionicons name="library-outline" size={20} color={colors.isDark ? '#a78bfa' : '#7c3aed'} />
+              <Text style={{ fontSize: 16, fontWeight: '700', color: colors.isDark ? '#a78bfa' : '#7c3aed' }}>
+                Need a distraction?
+              </Text>
+            </TouchableOpacity>
+
+          </View>
+
+        </ScrollView>
+      </SafeAreaView>
+    </AnimatedSkyBackground>
   );
 }

@@ -71,7 +71,7 @@ export function PledgeModal({
             showsVerticalScrollIndicator={false}
           >
             {/* Hand icon */}
-            <View style={{ alignItems: 'center', marginTop: 24, marginBottom: 20 }}>
+            <View style={{ alignItems: 'center', marginTop: 48, marginBottom: 20 }}>
               <Ionicons
                 name="hand-left-outline"
                 size={100}

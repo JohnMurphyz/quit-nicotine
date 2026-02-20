@@ -1,34 +1,35 @@
-import { View, Text, ScrollView, Pressable, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { ActionButtonRow } from '@/src/components/ActionButtonRow';
+import { AnimatedSkyBackground } from '@/src/components/AnimatedSkyBackground';
+import { BenefitSelectorModal } from '@/src/components/BenefitSelectorModal';
+import { BreathingOrb } from '@/src/components/BreathingOrb';
+import { CravingLogger } from '@/src/components/CravingLogger';
+import { DayStreakRow } from '@/src/components/DayStreakRow';
+import { FlameIcon } from '@/src/components/FlameIcon';
+import { HomeMainCard } from '@/src/components/HomeMainCard';
+import { HomeTodoCard } from '@/src/components/HomeTodoCard';
+import { MeditateModal } from '@/src/components/MeditateModal';
+import { PledgeModal } from '@/src/components/PledgeModal';
+import { RelapseModal } from '@/src/components/RelapseModal';
+import { StreakCelebrationModal } from '@/src/components/StreakCelebrationModal';
+import { SymptomSelectorModal } from '@/src/components/SymptomSelectorModal';
+import { useCheckInInterval } from '@/src/hooks/useCheckInInterval';
+import { useCravings } from '@/src/hooks/useCravings';
+import { useJournal } from '@/src/hooks/useJournal';
+import { useNotifications } from '@/src/hooks/useNotifications';
+import { useStreak } from '@/src/hooks/useStreak';
+import { useThemeColors } from '@/src/hooks/useThemeColors';
+import type { AppStackParamList, TabParamList } from '@/src/navigation/types';
+import { useAuthStore } from '@/src/stores/authStore';
 import { Ionicons } from '@expo/vector-icons';
-import { differenceInDays, differenceInHours, differenceInMinutes } from 'date-fns';
+import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import type { CompositeNavigationProp } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { CompositeNavigationProp } from '@react-navigation/native';
-import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import { useStreak } from '@/src/hooks/useStreak';
-import { useAuthStore } from '@/src/stores/authStore';
-import { useCravings } from '@/src/hooks/useCravings';
-import { useCheckInInterval } from '@/src/hooks/useCheckInInterval';
-import { useThemeColors } from '@/src/hooks/useThemeColors';
-import { DayStreakRow } from '@/src/components/DayStreakRow';
-import { CravingLogger } from '@/src/components/CravingLogger';
-import { ActionButtonRow } from '@/src/components/ActionButtonRow';
-import { PledgeModal } from '@/src/components/PledgeModal';
-import { MeditateModal } from '@/src/components/MeditateModal';
-import { MoreSheet } from '@/src/components/MoreSheet';
-import { AnimatedSkyBackground } from '@/src/components/AnimatedSkyBackground';
-import { BreathingOrb } from '@/src/components/BreathingOrb';
-import { FlameIcon } from '@/src/components/FlameIcon';
-import { BenefitSelectorModal } from '@/src/components/BenefitSelectorModal';
-import { SymptomSelectorModal } from '@/src/components/SymptomSelectorModal';
-import { StreakCelebrationModal } from '@/src/components/StreakCelebrationModal';
-import { HomeTodoCard } from '@/src/components/HomeTodoCard';
-import { HomeMainCard } from '@/src/components/HomeMainCard';
-import { useNotifications } from '@/src/hooks/useNotifications';
-import { useJournal } from '@/src/hooks/useJournal';
-import type { AppStackParamList, TabParamList } from '@/src/navigation/types';
+import { differenceInDays, differenceInHours, differenceInMinutes } from 'date-fns';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import Animated, { LinearTransition } from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Nav = CompositeNavigationProp<
   BottomTabNavigationProp<TabParamList, 'Home'>,
@@ -49,11 +50,11 @@ export default function HomeScreen() {
   const [cravingModalVisible, setCravingModalVisible] = useState(false);
   const [pledgeModalVisible, setPledgeModalVisible] = useState(false);
   const [meditateModalVisible, setMeditateModalVisible] = useState(false);
-  const [moreSheetVisible, setMoreSheetVisible] = useState(false);
   const [benefitSelectorVisible, setBenefitSelectorVisible] = useState(false);
   const [symptomSelectorVisible, setSymptomSelectorVisible] = useState(false);
   const [streakCelebrationVisible, setStreakCelebrationVisible] = useState(false);
   const [celebrationStreak, setCelebrationStreak] = useState(0);
+  const [relapseModalVisible, setRelapseModalVisible] = useState(false);
 
   const motivations = profile?.motivations ?? [];
   const trackedSymptoms = profile?.tracked_symptoms ?? [];
@@ -78,27 +79,27 @@ export default function HomeScreen() {
   const handlePledge = useCallback(async () => {
     const newStreak = (streak?.current_streak ?? 0) + 1;
     await recordCheckIn();
-    confirmToday();
+    await confirmToday();
     if (newStreak >= 3) {
       setCelebrationStreak(newStreak);
       setStreakCelebrationVisible(true);
     }
   }, [recordCheckIn, confirmToday, streak?.current_streak]);
 
-  const handleReset = useCallback(() => {
+  const handleRelapse = useCallback(() => {
     Alert.alert(
-      'Reset Timer',
-      'This will reset your check-in. Are you sure?',
+      'Did you relapse?',
+      'This will reset your progress back to zero.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Reset',
+          text: 'Yes, I relapsed',
           style: 'destructive',
-          onPress: () => resetCheckIn(),
+          onPress: () => setRelapseModalVisible(true),
         },
       ],
     );
-  }, [resetCheckIn]);
+  }, []);
 
   const actionButtons = [
     {
@@ -108,161 +109,160 @@ export default function HomeScreen() {
       completed: alreadyPledged,
     },
     {
-      icon: 'body',
+      icon: 'leaf-outline',
       label: 'Meditate',
       onPress: () => setMeditateModalVisible(true),
     },
     {
-      icon: 'refresh',
-      label: 'Reset',
-      onPress: handleReset,
-    },
-    {
-      icon: 'ellipsis-horizontal',
-      label: 'More',
-      onPress: () => setMoreSheetVisible(true),
+      icon: 'alert-circle-outline',
+      label: 'Relapsed',
+      onPress: handleRelapse,
     },
   ];
 
   return (
     <AnimatedSkyBackground>
-    <SafeAreaView className="flex-1">
-      {/* Header — app title + streak flame badge */}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingTop: 12, paddingBottom: 4 }}>
-        <Text style={{ fontSize: 24, fontWeight: '700', color: colors.textPrimary }}>FREED</Text>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-          <FlameIcon size={26} active={(streak?.current_streak ?? 0) > 0} />
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: '800',
-              color: (streak?.current_streak ?? 0) > 0 ? colors.streakTextActive : colors.streakText,
+      <SafeAreaView className="flex-1" edges={['top']}>
+        {/* Header — app title + streak flame badge */}
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingTop: 12, paddingBottom: 4 }}>
+          <Text style={{ fontSize: 24, fontWeight: '700', color: colors.textPrimary }}>FREED</Text>
+          <Pressable
+            onPress={() => {
+              setCelebrationStreak(streak?.current_streak ?? 0);
+              setStreakCelebrationVisible(true);
             }}
+            style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}
           >
-            {streak?.current_streak ?? 0}
-          </Text>
-        </View>
-      </View>
-
-      {/* Day Streak Row */}
-      <DayStreakRow confirmations={confirmations} />
-
-      {/* Main content */}
-      <ScrollView
-        className="flex-1"
-        contentContainerStyle={{ paddingBottom: 24 }}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Breathing Orb */}
-        <View style={{ alignItems: 'center', paddingTop: 16 }}>
-          <BreathingOrb size={160} />
-        </View>
-
-        {/* Timer display */}
-        <View style={{ alignItems: 'center', paddingVertical: 16 }}>
-          <Text style={{ fontSize: 13, color: colors.textMuted, fontWeight: '600', marginBottom: 4, letterSpacing: 0.5 }}>
-            You've been nicotine-free for
-          </Text>
-          <Text style={{ fontSize: 44, fontWeight: '700', color: colors.textPrimary, lineHeight: 54 }}>
-            {quitDuration?.days ?? 0} days
-          </Text>
-          <View style={{ backgroundColor: colors.pillBg, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 6, marginTop: 8 }}>
-            <Text style={{ color: colors.pillText, fontWeight: '600', fontSize: 14 }}>
-              {quitDuration?.hours ?? 0}hr {quitDuration?.minutes ?? 0}m
+            <FlameIcon size={26} active={(streak?.current_streak ?? 0) > 0} />
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: '800',
+                color: (streak?.current_streak ?? 0) > 0 ? colors.streakTextActive : colors.streakText,
+              }}
+            >
+              {streak?.current_streak ?? 0}
             </Text>
-          </View>
+          </Pressable>
         </View>
 
-        {/* Action buttons */}
-        <ActionButtonRow buttons={actionButtons} />
+        {/* Day Streak Row */}
+        <DayStreakRow confirmations={confirmations} />
 
-        {/* To-do checklist */}
-        {profile && (
-          <HomeTodoCard
-            profile={profile}
-            notificationsEnabled={notificationsEnabled}
-            hasJournalEntries={entries.length > 0}
-            onSetGoals={() => setBenefitSelectorVisible(true)}
-            onTrackSymptoms={() => setSymptomSelectorVisible(true)}
-            onEnableNotifications={requestPermission}
-            onAddPartner={() => navigation.navigate('Accountability')}
-            onDestroyProducts={() => navigation.navigate('Settings')}
-            onWriteJournal={() => navigation.navigate('Journal')}
-          />
-        )}
+        {/* Main content */}
+        <ScrollView
+          className="flex-1"
+          contentContainerStyle={{ paddingBottom: 24 }}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Breathing Orb */}
+          <View style={{ alignItems: 'center', paddingTop: 16 }}>
+            <BreathingOrb size={160} />
+          </View>
 
-        {/* Main navigation */}
-        <HomeMainCard
-          onNavigate={(screen) => {
-            const tabScreens = ['Journal', 'Learn', 'Timeline'];
-            if (tabScreens.includes(screen)) {
-              navigation.navigate('Tabs', { screen } as any);
-            } else {
-              (navigation.navigate as any)(screen);
-            }
-          }}
+          {/* Timer display */}
+          <View style={{ alignItems: 'center', paddingVertical: 16 }}>
+            <Text style={{ fontSize: 13, color: colors.textMuted, fontWeight: '600', marginBottom: 4, letterSpacing: 0.5 }}>
+              You've been nicotine-free for
+            </Text>
+            <Text style={{ fontSize: 44, fontWeight: '700', color: colors.textPrimary, lineHeight: 54 }}>
+              {quitDuration?.days ?? 0} days
+            </Text>
+            <View style={{ backgroundColor: colors.pillBg, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 6, marginTop: 8 }}>
+              <Text style={{ color: colors.pillText, fontWeight: '600', fontSize: 14 }}>
+                {quitDuration?.hours ?? 0}hr {quitDuration?.minutes ?? 0}m
+              </Text>
+            </View>
+          </View>
+
+          {/* Action buttons */}
+          <ActionButtonRow buttons={actionButtons} />
+
+          {/* Panic Button */}
+          <Pressable
+            onPress={() => navigation.navigate('CravingSOS')}
+            style={{ marginHorizontal: 16, marginTop: 8, backgroundColor: '#ef4444', borderRadius: 16, padding: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+          >
+            <Ionicons name="alert-circle" size={22} color="white" />
+            <Text style={{ color: 'white', fontWeight: '700', fontSize: 17 }}>Panic Button</Text>
+          </Pressable>
+
+          {/* To-do checklist */}
+          {profile && (
+            <HomeTodoCard
+              profile={profile}
+              notificationsEnabled={notificationsEnabled}
+              hasJournalEntries={entries.length > 0}
+              onSetGoals={() => setBenefitSelectorVisible(true)}
+              onTrackSymptoms={() => setSymptomSelectorVisible(true)}
+              onEnableNotifications={requestPermission}
+              onAddPartner={() => navigation.navigate('Accountability')}
+              onDestroyProducts={() => navigation.navigate('DestroyProducts')}
+              onWriteJournal={() => navigation.navigate('JournalEntry', {})}
+            />
+          )}
+
+          {/* Main navigation */}
+          <Animated.View layout={LinearTransition.duration(300)}>
+            <HomeMainCard
+              onNavigate={(screen) => {
+                const tabScreens = ['Learn', 'Timeline'];
+                if (tabScreens.includes(screen)) {
+                  navigation.navigate('Tabs', { screen } as any);
+                } else {
+                  (navigation.navigate as any)(screen);
+                }
+              }}
+            />
+          </Animated.View>
+        </ScrollView>
+
+        {/* Modals */}
+        <PledgeModal
+          visible={pledgeModalVisible}
+          onClose={() => setPledgeModalVisible(false)}
+          onPledge={handlePledge}
+          pledging={confirming}
+          alreadyPledged={alreadyPledged}
+          daysSinceQuit={quitDuration?.days ?? 0}
         />
-      </ScrollView>
 
-      {/* Panic Button — pinned */}
-      <Pressable
-        onPress={() => navigation.navigate('CravingSOS')}
-        style={{ margin: 16, backgroundColor: '#ef4444', borderRadius: 16, padding: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}
-      >
-        <Ionicons name="alert-circle" size={22} color="white" />
-        <Text style={{ color: 'white', fontWeight: '700', fontSize: 17 }}>Panic Button</Text>
-      </Pressable>
+        <MeditateModal
+          visible={meditateModalVisible}
+          onClose={() => setMeditateModalVisible(false)}
+        />
 
-      {/* Modals */}
-      <PledgeModal
-        visible={pledgeModalVisible}
-        onClose={() => setPledgeModalVisible(false)}
-        onPledge={handlePledge}
-        pledging={confirming}
-        alreadyPledged={alreadyPledged}
-        daysSinceQuit={quitDuration?.days ?? 0}
-      />
+        <CravingLogger
+          visible={cravingModalVisible}
+          onClose={() => setCravingModalVisible(false)}
+          onLog={logCraving}
+          onOpenSOS={() => { setCravingModalVisible(false); navigation.navigate('CravingSOS'); }}
+          logging={logging}
+        />
 
-      <MeditateModal
-        visible={meditateModalVisible}
-        onClose={() => setMeditateModalVisible(false)}
-      />
+        <BenefitSelectorModal
+          visible={benefitSelectorVisible}
+          onClose={() => setBenefitSelectorVisible(false)}
+          initialSelections={motivations}
+        />
 
-      <MoreSheet
-        visible={moreSheetVisible}
-        onClose={() => setMoreSheetVisible(false)}
-        onLogCraving={() => setCravingModalVisible(true)}
-        onOpenJournal={() => navigation.navigate('Journal')}
-        onOpenProfile={() => navigation.navigate('Profile')}
-        onOpenAccountability={() => navigation.navigate('Accountability')}
-      />
+        <SymptomSelectorModal
+          visible={symptomSelectorVisible}
+          onClose={() => setSymptomSelectorVisible(false)}
+          initialSelections={trackedSymptoms}
+        />
 
-      <CravingLogger
-        visible={cravingModalVisible}
-        onClose={() => setCravingModalVisible(false)}
-        onLog={logCraving}
-        onOpenSOS={() => { setCravingModalVisible(false); navigation.navigate('CravingSOS'); }}
-        logging={logging}
-      />
-
-      <BenefitSelectorModal
-        visible={benefitSelectorVisible}
-        onClose={() => setBenefitSelectorVisible(false)}
-        initialSelections={motivations}
-      />
-
-      <SymptomSelectorModal
-        visible={symptomSelectorVisible}
-        onClose={() => setSymptomSelectorVisible(false)}
-        initialSelections={trackedSymptoms}
-      />
-
-      <StreakCelebrationModal
-        visible={streakCelebrationVisible}
-        onClose={() => setStreakCelebrationVisible(false)}
-        streakCount={celebrationStreak}
-      />
-    </SafeAreaView>
+        <StreakCelebrationModal
+          visible={streakCelebrationVisible}
+          onClose={() => setStreakCelebrationVisible(false)}
+          streakCount={celebrationStreak}
+        />
+        <RelapseModal
+          visible={relapseModalVisible}
+          onClose={() => setRelapseModalVisible(false)}
+          onReset={resetCheckIn}
+        />
+      </SafeAreaView>
     </AnimatedSkyBackground>
   );
 }

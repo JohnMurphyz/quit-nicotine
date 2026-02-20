@@ -1,6 +1,6 @@
-import { Modal, View, Text, Pressable } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { useThemeColors } from '@/src/hooks/useThemeColors';
+import { Ionicons } from '@expo/vector-icons';
+import { Modal, Pressable, Text, View } from 'react-native';
 
 interface MoreSheetProps {
   visible: boolean;
@@ -22,14 +22,6 @@ export function MoreSheet({ visible, onClose, onLogCraving, onOpenJournal, onOpe
   const callbacks = { onLogCraving, onOpenJournal, onOpenProfile, onOpenAccountability };
   const colors = useThemeColors();
 
-  // Always light-themed so it contrasts against the dark sky
-  const sheetBg = '#faf7f4';
-  const handleColor = '#d4c4b0';
-  const dividerColor = '#ebe1d4';
-  const outlineColor = 'rgba(140,122,102,0.25)';
-  const iconColor = '#8c7a66';
-  const labelColor = '#362d23';
-
   return (
     <Modal
       visible={visible}
@@ -37,11 +29,11 @@ export function MoreSheet({ visible, onClose, onLogCraving, onOpenJournal, onOpe
       transparent
       onRequestClose={onClose}
     >
-      <Pressable style={{ flex: 1 }} onPress={onClose} />
+      <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)' }} onPress={onClose} />
 
       <View
         style={{
-          backgroundColor: sheetBg,
+          backgroundColor: colors.cardBg,
           borderTopLeftRadius: 24,
           borderTopRightRadius: 24,
           paddingHorizontal: 20,
@@ -55,7 +47,7 @@ export function MoreSheet({ visible, onClose, onLogCraving, onOpenJournal, onOpe
             width: 36,
             height: 4,
             borderRadius: 2,
-            backgroundColor: handleColor,
+            backgroundColor: colors.borderColor,
             alignSelf: 'center',
             marginBottom: 20,
           }}
@@ -68,14 +60,15 @@ export function MoreSheet({ visible, onClose, onLogCraving, onOpenJournal, onOpe
               callbacks[item.key]();
               onClose();
             }}
-            style={{
+            style={({ pressed }) => ({
               flexDirection: 'row',
               alignItems: 'center',
               gap: 14,
               paddingVertical: 16,
               borderTopWidth: i === 0 ? 0 : 1,
-              borderTopColor: dividerColor,
-            }}
+              borderTopColor: colors.borderColor,
+              opacity: pressed ? 0.7 : 1,
+            })}
           >
             <View
               style={{
@@ -83,15 +76,15 @@ export function MoreSheet({ visible, onClose, onLogCraving, onOpenJournal, onOpe
                 height: 40,
                 borderRadius: 20,
                 borderWidth: 1.5,
-                borderColor: outlineColor,
+                borderColor: colors.borderColor,
                 backgroundColor: 'transparent',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
-              <Ionicons name={item.icon as any} size={20} color={iconColor} />
+              <Ionicons name={item.icon as any} size={20} color={colors.textSecondary} />
             </View>
-            <Text style={{ fontSize: 16, fontWeight: '600', color: labelColor }}>
+            <Text style={{ fontSize: 16, fontWeight: '600', color: colors.textPrimary }}>
               {item.label}
             </Text>
           </Pressable>

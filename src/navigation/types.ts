@@ -38,15 +38,24 @@ export type AppStackParamList = {
   CravingSOS: undefined;
   Articles: undefined;
   Settings: undefined;
+  JournalDetail: { entryId: string };
+  JournalEntry: { entryId?: string; initialTitle?: string; initialContent?: string };
+  Reasons: undefined;
+  JournalList: undefined;
+  PartnerDashboardPreview: undefined;
+  InvitePreview: { code: string };
+  DestroyProducts: undefined;
+  RelapseWizard: undefined;
 };
 
 export type RootStackParamList = {
   Onboarding: NavigatorScreenParams<OnboardingStackParamList>;
   App: NavigatorScreenParams<AppStackParamList>;
+  GuestApp: undefined;
 };
 
 declare global {
   namespace ReactNavigation {
-    interface RootParamList extends RootStackParamList {}
+    interface RootParamList extends RootStackParamList { }
   }
 }
