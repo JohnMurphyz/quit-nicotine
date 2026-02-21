@@ -46,6 +46,8 @@ export type AppStackParamList = {
   InvitePreview: { code: string };
   DestroyProducts: undefined;
   RelapseWizard: undefined;
+  Relaxation: undefined;
+  Motivation: undefined;
 };
 
 export type RootStackParamList = {

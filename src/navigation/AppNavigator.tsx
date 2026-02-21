@@ -3,6 +3,8 @@ import ArticlesScreen from '@/src/screens/ArticlesScreen';
 import ContentDetailScreen from '@/src/screens/ContentDetailScreen';
 import CravingSOSScreen from '@/src/screens/CravingSOSScreen';
 import DestroyProductsScreen from '@/src/screens/DestroyProductsScreen';
+import MotivationScreen from '@/src/screens/MotivationScreen';
+import RelaxationScreen from '@/src/screens/RelaxationScreen';
 import RelapseWizardScreen from '@/src/screens/RelapseWizardScreen';
 import JournalDetailScreen from '@/src/screens/JournalDetailScreen';
 import JournalEntryScreen from '@/src/screens/JournalEntryScreen';
@@ -86,6 +88,16 @@ export function AppNavigator() {
         name="RelapseWizard"
         component={RelapseWizardScreen}
         options={{ presentation: 'fullScreenModal', headerShown: false }}
+      />
+      <Stack.Screen
+        name="Relaxation"
+        component={RelaxationScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Motivation"
+        component={MotivationScreen}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="InvitePreview"

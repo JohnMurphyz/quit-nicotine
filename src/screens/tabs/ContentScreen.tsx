@@ -1,13 +1,13 @@
-import { useState, useRef } from 'react';
-import { View, Text, ScrollView, Pressable, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { AppStackParamList } from '@/src/navigation/types';
-import { MeditateModal } from '@/src/components/MeditateModal';
 import { AnimatedSkyBackground } from '@/src/components/AnimatedSkyBackground';
+import { LibraryCard } from '@/src/components/LibraryCard';
+import { MeditateModal } from '@/src/components/MeditateModal';
 import { useThemeColors } from '@/src/hooks/useThemeColors';
+import type { AppStackParamList } from '@/src/navigation/types';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useState } from 'react';
+import { Image, Linking, Pressable, ScrollView, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Nav = NativeStackNavigationProp<AppStackParamList>;
 
@@ -56,164 +56,145 @@ export const CONTENT_ITEMS = [
   },
 ];
 
-const QUICK_ACTIONS = [
-  { label: 'Breathe', icon: 'leaf' as const, action: 'breathing' },
-  { label: 'Meditate', icon: 'flower' as const, action: 'meditate' },
-  { label: 'Journal', icon: 'book' as const, action: 'journal' },
-  { label: 'SOS', icon: 'alert-circle' as const, action: 'sos' },
+interface Video {
+  id: string;
+  title: string;
+}
+
+const VIDEOS: Video[] = [
+  {
+    id: 'QpnGsasp9j8',
+    title: 'Why You Should Quit Nicotine',
+  },
+  {
+    id: 'i4gvIeA3RcI',
+    title: 'Understanding & Treating Addiction — Dr. Anna Lembke',
+  },
+  {
+    id: 'aEfkx3DsXjs',
+    title: 'Find Balance in the Age of Indulgence — Dr. Anna Lembke',
+  },
+  {
+    id: 'jCWADjUA9iI',
+    title: 'Dopamine Fasting 2.0 — Overcome Addiction & Restore Motivation',
+  },
+  {
+    id: 'yLGZeoC9WMs',
+    title: 'Break the Cycle of Addiction — Ram Dass',
+  },
+  {
+    id: 'AT9mnHrQoL0',
+    title: 'Vaping or Nicotine Pouch? — Bryan Johnson',
+  },
+  {
+    id: 'cHEOsKddURQ',
+    title: 'Vaping Is Too Good To Be True — Kurzgesagt',
+  },
+  {
+    id: '0TL2Vh7goJc',
+    title: 'Quit Smoking — Allen Carr',
+  },
 ];
+
+function getThumbnail(videoId: string) {
+  return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+}
 
 export default function ContentScreen() {
   const navigation = useNavigation<Nav>();
   const colors = useThemeColors();
   const [showMeditate, setShowMeditate] = useState(false);
-  const relaxationRef = useRef<View>(null);
-  const scrollRef = useRef<ScrollView>(null);
 
-  const handleQuickAction = (action: string) => {
-    switch (action) {
-      case 'breathing':
-      case 'meditate':
-        setShowMeditate(true);
-        break;
-      case 'journal':
-        navigation.getParent()?.navigate('Tabs', { screen: 'Journal' });
-        break;
-      case 'sos':
-        navigation.navigate('CravingSOS');
-        break;
-    }
-  };
-
-  const scrollToRelaxation = () => {
-    relaxationRef.current?.measureLayout(
-      scrollRef.current as any,
-      (_x, y) => {
-        scrollRef.current?.scrollTo({ y, animated: true });
-      },
-      () => {},
-    );
-  };
 
   return (
     <AnimatedSkyBackground>
-    <SafeAreaView className="flex-1" edges={['top']}>
-      <ScrollView
-        ref={scrollRef}
-        className="flex-1 px-5 pt-6 pb-12"
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Header */}
-        <Text style={{ fontSize: 30, fontWeight: '700', color: colors.textPrimary, marginBottom: 24 }}>Library</Text>
+      <SafeAreaView className="flex-1" edges={['top']}>
+        <ScrollView
+          className="flex-1 px-5 pt-6 pb-12"
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Header */}
+          <Text style={{ fontSize: 30, fontWeight: '700', color: colors.textPrimary, marginBottom: 24 }}>Library</Text>
 
-        {/* Quick Action Icons */}
-        <View className="flex-row justify-between mb-8">
-          {QUICK_ACTIONS.map((item) => (
-            <Pressable
-              key={item.action}
-              className="items-center"
-              onPress={() => handleQuickAction(item.action)}
-            >
-              <View
-                className="w-16 h-16 rounded-full items-center justify-center mb-2"
-                style={{ backgroundColor: colors.elevatedBg }}
+          {/* Category Buttons 2x2 Grid */}
+          <View className="flex-col gap-3 mb-8">
+            <View className="flex-row gap-3">
+              <LibraryCard
+                type="articles"
+                title="Articles"
+                index={0}
+                onPress={() => navigation.navigate('Articles')}
+              />
+              <LibraryCard
+                type="relaxation"
+                title="Relaxation"
+                index={1}
+                onPress={() => navigation.navigate('Relaxation')}
+              />
+            </View>
+            <View className="flex-row gap-3">
+              <LibraryCard
+                type="breathe"
+                title="Breathe"
+                index={2}
+                onPress={() => setShowMeditate(true)}
+              />
+              <LibraryCard
+                type="motivation"
+                title="Motivation"
+                index={3}
+                onPress={() => navigation.navigate('Motivation')}
+              />
+            </View>
+          </View>
+
+          {/* Videos Section */}
+          <Text style={{ fontSize: 20, fontWeight: '700', color: colors.textPrimary, marginBottom: 14 }}>
+            Videos
+          </Text>
+          <View style={{ gap: 14, marginBottom: 40 }}>
+            {VIDEOS.map((video) => (
+              <Pressable
+                key={video.id}
+                onPress={() => Linking.openURL(`https://www.youtube.com/watch?v=${video.id}`)}
+                style={({ pressed }) => ({
+                  opacity: pressed ? 0.85 : 1,
+                  transform: [{ scale: pressed ? 0.97 : 1 }],
+                })}
               >
-                <Ionicons name={item.icon} size={28} color={colors.textAccent} />
-              </View>
-              <Text style={{ fontSize: 12, color: colors.textMuted }}>{item.label}</Text>
-            </Pressable>
-          ))}
-        </View>
+                <Image
+                  source={{ uri: getThumbnail(video.id) }}
+                  style={{
+                    width: '100%',
+                    aspectRatio: 16 / 9,
+                    borderRadius: 14,
+                    backgroundColor: colors.elevatedBg,
+                  }}
+                />
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontWeight: '600',
+                    color: colors.textPrimary,
+                    marginTop: 8,
+                    textAlign: 'center',
+                  }}
+                  numberOfLines={2}
+                >
+                  {video.title}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
 
-        {/* Category Buttons */}
-        <View className="flex-row gap-3 mb-8">
-          <Pressable
-            className="flex-1 rounded-2xl p-5 items-center justify-center"
-            style={{
-              backgroundColor: '#f97316',
-              minHeight: 80,
-            }}
-            onPress={() => navigation.navigate('Articles')}
-          >
-            <Ionicons name="document-text" size={28} color="white" />
-            <Text className="text-white font-semibold text-base mt-1">
-              Articles
-            </Text>
-          </Pressable>
-          <Pressable
-            className="flex-1 rounded-2xl p-5 items-center justify-center"
-            style={{
-              backgroundColor: '#3b82f6',
-              minHeight: 80,
-            }}
-            onPress={scrollToRelaxation}
-          >
-            <Ionicons name="musical-notes" size={28} color="white" />
-            <Text className="text-white font-semibold text-base mt-1">
-              Relaxation
-            </Text>
-          </Pressable>
-        </View>
+        </ScrollView>
 
-        {/* Relaxation Noises Section */}
-        <View ref={relaxationRef} className="mb-10">
-          <Text style={{ fontSize: 20, fontWeight: '700', color: colors.textPrimary, marginBottom: 4 }}>
-            Relaxation Noises
-          </Text>
-          <Text style={{ fontSize: 14, color: colors.textMuted, marginBottom: 16 }}>
-            Calm your mind with soothing sounds
-          </Text>
-
-          <Pressable
-            className="rounded-2xl overflow-hidden"
-            style={{ backgroundColor: colors.cardBg }}
-            onPress={() => Alert.alert('Coming Soon', 'Relaxation sounds are coming in a future update.')}
-          >
-            <View
-              className="h-40 items-center justify-center"
-              style={{ backgroundColor: colors.elevatedBg }}
-            >
-              <Ionicons name="cloud-outline" size={48} color={colors.textAccent} />
-            </View>
-            <View className="p-4">
-              <Text style={{ fontSize: 18, fontWeight: '600', color: colors.textPrimary }}>
-                Morning Reset
-              </Text>
-              <Text style={{ fontSize: 14, color: colors.textMuted, marginTop: 4 }}>
-                Start your day with calming ambient sounds
-              </Text>
-            </View>
-          </Pressable>
-
-          <Pressable
-            className="rounded-2xl overflow-hidden mt-3"
-            style={{ backgroundColor: colors.cardBg }}
-            onPress={() => Alert.alert('Coming Soon', 'Relaxation sounds are coming in a future update.')}
-          >
-            <View
-              className="h-40 items-center justify-center"
-              style={{ backgroundColor: colors.elevatedBg }}
-            >
-              <Ionicons name="moon-outline" size={48} color={colors.textAccent} />
-            </View>
-            <View className="p-4">
-              <Text style={{ fontSize: 18, fontWeight: '600', color: colors.textPrimary }}>
-                Deep Calm
-              </Text>
-              <Text style={{ fontSize: 14, color: colors.textMuted, marginTop: 4 }}>
-                Wind down with deep, peaceful tones
-              </Text>
-            </View>
-          </Pressable>
-        </View>
-      </ScrollView>
-
-      {/* Modals */}
-      <MeditateModal
-        visible={showMeditate}
-        onClose={() => setShowMeditate(false)}
-      />
-    </SafeAreaView>
+        {/* Modals */}
+        <MeditateModal
+          visible={showMeditate}
+          onClose={() => setShowMeditate(false)}
+        />
+      </SafeAreaView>
     </AnimatedSkyBackground>
   );
 }
