@@ -1,13 +1,14 @@
-import { View, Text, ScrollView, Pressable, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { AnimatedSkyBackground } from '@/src/components/AnimatedSkyBackground';
+import { ScreenTitle } from '@/src/components/ScreenTitle';
+import { useThemeColors } from '@/src/hooks/useThemeColors';
+import type { AppStackParamList } from '@/src/navigation/types';
+import { useJournalStore } from '@/src/stores/journalStore';
 import { Ionicons } from '@expo/vector-icons';
-import { format } from 'date-fns';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useJournalStore } from '@/src/stores/journalStore';
-import { useThemeColors } from '@/src/hooks/useThemeColors';
-import { AnimatedSkyBackground } from '@/src/components/AnimatedSkyBackground';
-import type { AppStackParamList } from '@/src/navigation/types';
+import { format } from 'date-fns';
+import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Props = NativeStackScreenProps<AppStackParamList, 'JournalDetail'>;
 
@@ -30,7 +31,7 @@ export default function JournalDetailScreen() {
           try {
             await deleteEntry(entry.id);
             navigation.goBack();
-          } catch {}
+          } catch { }
         },
       },
     ]);
@@ -80,9 +81,9 @@ export default function JournalDetailScreen() {
           {/* Entry Card */}
           <View style={cardStyle}>
             {entry.title ? (
-              <Text style={{ fontSize: 32, fontWeight: '800', color: colors.textPrimary, lineHeight: 40, marginBottom: 16 }}>
+              <ScreenTitle style={{ lineHeight: 40, marginBottom: 16 }}>
                 {entry.title}
-              </Text>
+              </ScreenTitle>
             ) : null}
 
             <Text style={{ fontSize: 15, color: colors.textMuted, marginBottom: 20 }}>

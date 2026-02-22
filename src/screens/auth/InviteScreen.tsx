@@ -1,4 +1,5 @@
 import { AnimatedSkyBackground } from '@/src/components/AnimatedSkyBackground';
+import { ScreenTitle } from '@/src/components/ScreenTitle';
 import { useThemeColors } from '@/src/hooks/useThemeColors';
 import { supabase } from '@/src/lib/supabase';
 import { useAuthStore } from '@/src/stores/authStore';
@@ -163,9 +164,9 @@ export default function InviteScreen({ route }: Props) {
                             </Animated.View>
 
                             <Animated.View entering={FadeInDown.delay(300).duration(800)}>
-                                <Text style={{ fontSize: 40, fontWeight: '800', color: colors.textPrimary, textAlign: 'center', marginBottom: 24, letterSpacing: -1, lineHeight: 46 }}>
+                                <ScreenTitle style={{ fontSize: 32, textAlign: 'center', marginBottom: 24, lineHeight: 40 }}>
                                     Join {inviterName?.split(' ')[0]}'s{'\n'}Journey
-                                </Text>
+                                </ScreenTitle>
                             </Animated.View>
 
                             <Animated.View entering={FadeInDown.delay(400).duration(800)}>

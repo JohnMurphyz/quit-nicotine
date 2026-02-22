@@ -1,12 +1,14 @@
 import { AnimatedSkyBackground } from '@/src/components/AnimatedSkyBackground';
 import { LibraryCard } from '@/src/components/LibraryCard';
 import { MeditateModal } from '@/src/components/MeditateModal';
+import { ScreenTitle } from '@/src/components/ScreenTitle';
 import { useThemeColors } from '@/src/hooks/useThemeColors';
 import type { AppStackParamList } from '@/src/navigation/types';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useState } from 'react';
 import { Image, Linking, Pressable, ScrollView, Text, View } from 'react-native';
+import Animated, { Easing, FadeInDown } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Nav = NativeStackNavigationProp<AppStackParamList>;
@@ -52,6 +54,48 @@ export const CONTENT_ITEMS = [
     emoji: '🤝',
     title: 'Building Support',
     description: 'How the right people around you make quitting easier.',
+    readTime: '7 min read',
+  },
+  {
+    slug: 'chemistry',
+    emoji: '🧪',
+    title: 'The Chemistry of Dependence',
+    description: 'How nicotine hijacks your brain\'s own signaling molecules.',
+    readTime: '6 min read',
+  },
+  {
+    slug: 'habit-loops',
+    emoji: '🔄',
+    title: 'Breaking Habit Loops',
+    description: 'Understand and rewire the automatic programs driving your use.',
+    readTime: '6 min read',
+  },
+  {
+    slug: 'healing',
+    emoji: '💚',
+    title: 'Physical Healing Milestones',
+    description: 'How every organ system recovers after you quit.',
+    readTime: '7 min read',
+  },
+  {
+    slug: 'sleep-energy',
+    emoji: '😴',
+    title: 'Sleep & Energy Recovery',
+    description: 'Why withdrawal disrupts sleep and when your energy returns.',
+    readTime: '6 min read',
+  },
+  {
+    slug: 'freedom',
+    emoji: '🕊️',
+    title: 'The Freedom Mindset',
+    description: 'Shift from feeling deprived to feeling liberated.',
+    readTime: '6 min read',
+  },
+  {
+    slug: 'staying-quit',
+    emoji: '🛡️',
+    title: 'Staying Quit Long-Term',
+    description: 'Defend against complacency and the "just one" trap.',
     readTime: '7 min read',
   },
 ];
@@ -109,12 +153,15 @@ export default function ContentScreen() {
   return (
     <AnimatedSkyBackground>
       <SafeAreaView className="flex-1" edges={['top']}>
+        {/* Header */}
+        <View className="flex-row items-center justify-between px-5 pt-4 pb-2">
+          <ScreenTitle>Library</ScreenTitle>
+        </View>
+
         <ScrollView
           className="flex-1 px-5 pt-6 pb-12"
           showsVerticalScrollIndicator={false}
         >
-          {/* Header */}
-          <Text style={{ fontSize: 30, fontWeight: '700', color: colors.textPrimary, marginBottom: 24 }}>Library</Text>
 
           {/* Category Buttons 2x2 Grid */}
           <View className="flex-col gap-3 mb-8">
@@ -153,37 +200,41 @@ export default function ContentScreen() {
             Videos
           </Text>
           <View style={{ gap: 14, marginBottom: 40 }}>
-            {VIDEOS.map((video) => (
-              <Pressable
+            {VIDEOS.map((video, index) => (
+              <Animated.View
                 key={video.id}
-                onPress={() => Linking.openURL(`https://www.youtube.com/watch?v=${video.id}`)}
-                style={({ pressed }) => ({
-                  opacity: pressed ? 0.85 : 1,
-                  transform: [{ scale: pressed ? 0.97 : 1 }],
-                })}
+                entering={FadeInDown.delay(100 + (index + 4) * 100).duration(600).easing(Easing.out(Easing.cubic))}
               >
-                <Image
-                  source={{ uri: getThumbnail(video.id) }}
-                  style={{
-                    width: '100%',
-                    aspectRatio: 16 / 9,
-                    borderRadius: 14,
-                    backgroundColor: colors.elevatedBg,
-                  }}
-                />
-                <Text
-                  style={{
-                    fontSize: 14,
-                    fontWeight: '600',
-                    color: colors.textPrimary,
-                    marginTop: 8,
-                    textAlign: 'center',
-                  }}
-                  numberOfLines={2}
+                <Pressable
+                  onPress={() => Linking.openURL(`https://www.youtube.com/watch?v=${video.id}`)}
+                  style={({ pressed }) => ({
+                    opacity: pressed ? 0.85 : 1,
+                    transform: [{ scale: pressed ? 0.97 : 1 }],
+                  })}
                 >
-                  {video.title}
-                </Text>
-              </Pressable>
+                  <Image
+                    source={{ uri: getThumbnail(video.id) }}
+                    style={{
+                      width: '100%',
+                      aspectRatio: 16 / 9,
+                      borderRadius: 14,
+                      backgroundColor: colors.elevatedBg,
+                    }}
+                  />
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      fontWeight: '600',
+                      color: colors.textPrimary,
+                      marginTop: 8,
+                      textAlign: 'center',
+                    }}
+                    numberOfLines={2}
+                  >
+                    {video.title}
+                  </Text>
+                </Pressable>
+              </Animated.View>
             ))}
           </View>
 

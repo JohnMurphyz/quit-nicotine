@@ -48,6 +48,8 @@ export type AppStackParamList = {
   RelapseWizard: undefined;
   Relaxation: undefined;
   Motivation: undefined;
+  Feedback: undefined;
+  ContactUs: undefined;
 };
 
 export type RootStackParamList = {

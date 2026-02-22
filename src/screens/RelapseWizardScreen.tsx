@@ -1,4 +1,5 @@
 import { AnimatedSkyBackground } from '@/src/components/AnimatedSkyBackground';
+import { ScreenTitle } from '@/src/components/ScreenTitle';
 import { useThemeColors } from '@/src/hooks/useThemeColors';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -9,7 +10,7 @@ import {
   ScrollView,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -68,12 +69,9 @@ export default function RelapseWizardScreen() {
             <Ionicons name="heart" size={38} color={colors.textSecondary} />
           </View>
 
-          <Text style={{
-            fontSize: 28, fontWeight: '800', color: colors.textPrimary,
-            textAlign: 'center', lineHeight: 36, marginBottom: 20,
-          }}>
+          <ScreenTitle style={{ textAlign: 'center', lineHeight: 36, marginBottom: 20 }}>
             Relapses happen.
-          </Text>
+          </ScreenTitle>
 
           <Text style={{
             fontSize: 17, color: colors.textMuted,
@@ -106,12 +104,9 @@ export default function RelapseWizardScreen() {
           contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 24 }}
           showsVerticalScrollIndicator={false}
         >
-          <Text style={{
-            fontSize: 22, fontWeight: '800', color: colors.textPrimary,
-            marginBottom: 20,
-          }}>
+          <ScreenTitle style={{ fontSize: 22, marginBottom: 20 }}>
             What you need to know
-          </Text>
+          </ScreenTitle>
 
           {FACTS.map((fact) => (
             <View
@@ -162,12 +157,9 @@ export default function RelapseWizardScreen() {
           <Ionicons name="journal-outline" size={36} color={colors.textSecondary} />
         </View>
 
-        <Text style={{
-          fontSize: 26, fontWeight: '800', color: colors.textPrimary,
-          textAlign: 'center', lineHeight: 34, marginBottom: 12,
-        }}>
+        <ScreenTitle style={{ fontSize: 26, textAlign: 'center', lineHeight: 34, marginBottom: 12 }}>
           You've got this.
-        </Text>
+        </ScreenTitle>
 
         <Text style={{
           fontSize: 16, color: colors.textMuted,

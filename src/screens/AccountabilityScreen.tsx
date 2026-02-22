@@ -1,4 +1,5 @@
 import { AnimatedSkyBackground } from '@/src/components/AnimatedSkyBackground';
+import { ScreenTitle } from '@/src/components/ScreenTitle';
 import { useThemeColors } from '@/src/hooks/useThemeColors';
 import { supabase } from '@/src/lib/supabase';
 import { useAuthStore } from '@/src/stores/authStore';
@@ -180,7 +181,7 @@ export default function AccountabilityScreen() {
             <Pressable onPress={() => navigation.goBack()} style={{ padding: 8, marginLeft: -8, marginRight: 12, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 20 }}>
               <Ionicons name="chevron-back" size={24} color={colors.textPrimary} />
             </Pressable>
-            <Text style={{ fontSize: 24, fontWeight: '800', color: colors.textPrimary, letterSpacing: -0.5 }}>Partners</Text>
+            <ScreenTitle>Partners</ScreenTitle>
           </View>
 
           {/* Subtle Dev Preview Triggers */}

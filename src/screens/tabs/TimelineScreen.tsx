@@ -5,6 +5,7 @@ import { BenefitsList } from '@/src/components/BenefitsList';
 import { JourneyBar, MILESTONES } from '@/src/components/JourneyBar';
 import { MilestoneCelebrationModal } from '@/src/components/MilestoneCelebrationModal';
 import { RecoveryRing } from '@/src/components/RecoveryRing';
+import { ScreenTitle } from '@/src/components/ScreenTitle';
 import { SymptomRecoveryList } from '@/src/components/SymptomRecoveryList';
 import { SymptomSelectorModal } from '@/src/components/SymptomSelectorModal';
 import { ACHIEVEMENTS } from '@/src/constants/achievements';
@@ -17,6 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { differenceInCalendarDays, differenceInMinutes } from 'date-fns';
 import { useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
+import Animated, { Easing, FadeInDown, LinearTransition } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 type ActiveTab = 'goals' | 'symptoms';
@@ -152,41 +154,45 @@ export default function TimelineScreen() {
   return (
     <AnimatedSkyBackground>
       <SafeAreaView className="flex-1" edges={['top']}>
-        <ScrollView className="flex-1 px-4 pt-6" contentContainerClassName="pb-12">
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-            <Text style={{ fontSize: 24, fontWeight: '700', color: colors.textPrimary }}>
-              Recovery
-            </Text>
-            <Pressable
-              onPress={() => setMilestoneModalVisible(true)}
+        {/* Header */}
+        <View className="flex-row items-center justify-between px-5 pt-4 pb-2">
+          <ScreenTitle>Recovery</ScreenTitle>
+          <Pressable
+            onPress={() => setMilestoneModalVisible(true)}
+            style={{
+              flexDirection: 'row', alignItems: 'center', gap: 6,
+              backgroundColor: colors.isDark ? 'rgba(160,150,220,0.12)' : 'rgba(140,122,102,0.08)',
+              paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20,
+            }}
+          >
+            <Ionicons name="flag" size={16} color={colors.isDark ? '#c4b5fd' : '#8c7a66'} />
+            <Text
               style={{
-                flexDirection: 'row', alignItems: 'center', gap: 6,
-                backgroundColor: colors.isDark ? 'rgba(160,150,220,0.12)' : 'rgba(140,122,102,0.08)',
-                paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20,
+                fontSize: 14,
+                fontWeight: '700',
+                color: colors.textSecondary,
               }}
             >
-              <Ionicons name="flag" size={16} color={colors.isDark ? '#c4b5fd' : '#8c7a66'} />
-              <Text
-                style={{
-                  fontSize: 14,
-                  fontWeight: '700',
-                  color: colors.textSecondary,
-                }}
-              >
-                {daysFree}d
-              </Text>
-            </Pressable>
-          </View>
+              {daysFree}d
+            </Text>
+          </Pressable>
+        </View>
 
+        <ScrollView className="flex-1 px-4 pt-6" contentContainerClassName="pb-12">
           {/* The key prop perfectly handles "unmounting" and "remounting" these subcomponents
             when tracking milestones finish, retriggering all inner useEffect() animations natively */}
-          <RecoveryRing key={`ring-${animationKey}`} percentage={percentage} daysFree={daysFree} nextMilestoneLabel={nextMilestoneLabel} />
+          <Animated.View entering={FadeInDown.delay(100).duration(600).easing(Easing.out(Easing.cubic))}>
+            <RecoveryRing key={`ring-${animationKey}`} percentage={percentage} daysFree={daysFree} nextMilestoneLabel={nextMilestoneLabel} />
+          </Animated.View>
 
-          <JourneyBar key={`bar-${animationKey}`} minutesSinceQuit={minutesSinceQuit} />
+          <Animated.View entering={FadeInDown.delay(200).duration(600).easing(Easing.out(Easing.cubic))}>
+            <JourneyBar key={`bar-${animationKey}`} minutesSinceQuit={minutesSinceQuit} />
+          </Animated.View>
 
           {/* Next goal/symptom preview */}
           {nextItem && nextItemProgress !== null && nextItemDaysRemaining !== null && (
-            <View
+            <Animated.View
+              entering={FadeInDown.delay(300).duration(600).easing(Easing.out(Easing.cubic))}
               style={{
                 backgroundColor: colors.isDark ? colors.cardBg : '#f5f3ff',
                 borderWidth: colors.isDark ? 1 : 0,
@@ -222,11 +228,12 @@ export default function TimelineScreen() {
                   {formatDaysRemaining(nextItemDaysRemaining)}
                 </Text>
               </View>
-            </View>
+            </Animated.View>
           )}
 
           {/* Tab bar */}
-          <View
+          <Animated.View
+            entering={FadeInDown.delay(400).duration(600).easing(Easing.out(Easing.cubic))}
             style={{
               flexDirection: 'row',
               backgroundColor: colors.elevatedBg,
@@ -263,75 +270,77 @@ export default function TimelineScreen() {
                 </Pressable>
               );
             })}
-          </View>
+          </Animated.View>
 
-          {activeTab === 'goals' ? (
-            <>
-              {hasMotivations ? (
-                <BenefitsList motivations={motivations} daysFree={daysFree} onEdit={() => setSelectorVisible(true)} />
-              ) : (
-                <Pressable
-                  onPress={() => setSelectorVisible(true)}
-                  style={{
-                    borderWidth: 1,
-                    borderColor: colors.isDark ? 'rgba(160,150,220,0.2)' : colors.borderColor,
-                    borderRadius: 16,
-                    backgroundColor: colors.isDark ? 'rgba(160,150,220,0.06)' : colors.cardBg,
-                    padding: 20,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    marginBottom: 24,
-                  }}
-                >
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 16, fontWeight: '700', color: colors.textPrimary, marginBottom: 4 }}>
-                      Set your recovery goals
-                    </Text>
-                    <Text style={{ fontSize: 14, color: colors.textMuted }}>
-                      Track your progress toward the benefits that matter to you
-                    </Text>
-                  </View>
-                  <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
-                </Pressable>
-              )}
-            </>
-          ) : (
-            <>
-              {hasSymptoms ? (
-                <SymptomRecoveryList
-                  trackedSymptoms={trackedSymptoms}
-                  daysFree={daysFree}
-                  onEdit={() => setSymptomSelectorVisible(true)}
-                />
-              ) : (
-                <Pressable
-                  onPress={() => setSymptomSelectorVisible(true)}
-                  style={{
-                    borderWidth: 1,
-                    borderColor: colors.isDark ? 'rgba(160,150,220,0.2)' : colors.borderColor,
-                    borderRadius: 16,
-                    backgroundColor: colors.isDark ? 'rgba(160,150,220,0.06)' : colors.cardBg,
-                    padding: 20,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    marginBottom: 24,
-                  }}
-                >
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 16, fontWeight: '700', color: colors.textPrimary, marginBottom: 4 }}>
-                      Track your withdrawal symptoms
-                    </Text>
-                    <Text style={{ fontSize: 14, color: colors.textMuted }}>
-                      Monitor your recovery from withdrawal symptoms over time
-                    </Text>
-                  </View>
-                  <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
-                </Pressable>
-              )}
-            </>
-          )}
+          <Animated.View layout={LinearTransition.duration(300)} entering={FadeInDown.delay(500).duration(600).easing(Easing.out(Easing.cubic))}>
+            {activeTab === 'goals' ? (
+              <>
+                {hasMotivations ? (
+                  <BenefitsList motivations={motivations} daysFree={daysFree} onEdit={() => setSelectorVisible(true)} />
+                ) : (
+                  <Pressable
+                    onPress={() => setSelectorVisible(true)}
+                    style={{
+                      borderWidth: 1,
+                      borderColor: colors.isDark ? 'rgba(160,150,220,0.2)' : colors.borderColor,
+                      borderRadius: 16,
+                      backgroundColor: colors.isDark ? 'rgba(160,150,220,0.06)' : colors.cardBg,
+                      padding: 20,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      marginBottom: 24,
+                    }}
+                  >
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 16, fontWeight: '700', color: colors.textPrimary, marginBottom: 4 }}>
+                        Set your recovery goals
+                      </Text>
+                      <Text style={{ fontSize: 14, color: colors.textMuted }}>
+                        Track your progress toward the benefits that matter to you
+                      </Text>
+                    </View>
+                    <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
+                  </Pressable>
+                )}
+              </>
+            ) : (
+              <>
+                {hasSymptoms ? (
+                  <SymptomRecoveryList
+                    trackedSymptoms={trackedSymptoms}
+                    daysFree={daysFree}
+                    onEdit={() => setSymptomSelectorVisible(true)}
+                  />
+                ) : (
+                  <Pressable
+                    onPress={() => setSymptomSelectorVisible(true)}
+                    style={{
+                      borderWidth: 1,
+                      borderColor: colors.isDark ? 'rgba(160,150,220,0.2)' : colors.borderColor,
+                      borderRadius: 16,
+                      backgroundColor: colors.isDark ? 'rgba(160,150,220,0.06)' : colors.cardBg,
+                      padding: 20,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      marginBottom: 24,
+                    }}
+                  >
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 16, fontWeight: '700', color: colors.textPrimary, marginBottom: 4 }}>
+                        Track your withdrawal symptoms
+                      </Text>
+                      <Text style={{ fontSize: 14, color: colors.textMuted }}>
+                        Monitor your recovery from withdrawal symptoms over time
+                      </Text>
+                    </View>
+                    <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
+                  </Pressable>
+                )}
+              </>
+            )}
+          </Animated.View>
         </ScrollView>
 
         {/* Helper Component Overlays */}

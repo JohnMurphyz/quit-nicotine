@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useAuthStore } from '@/src/stores/authStore';
 import { AnimatedSkyBackground } from '@/src/components/AnimatedSkyBackground';
-import { useSkyThemeStore, type SkyTheme } from '@/src/stores/skyThemeStore';
+import { useSkyThemeStore } from '@/src/stores/skyThemeStore';
 import { useThemeColors } from '@/src/hooks/useThemeColors';
 import { useCheckInInterval } from '@/src/hooks/useCheckInInterval';
 import type { NicotineType } from '@/src/types/database';
@@ -204,9 +204,8 @@ export default function SettingsScreen() {
             </Text>
             <View className="flex-row gap-3">
               {([
-                { key: 'static' as SkyTheme, label: 'Night Sky', icon: 'moon' as const },
-                { key: 'dynamic' as SkyTheme, label: 'Dynamic', icon: 'sunny' as const },
-                { key: 'light' as SkyTheme, label: 'Light', icon: 'contrast' as const },
+                { key: 'static' as const, label: 'Night Sky', icon: 'moon' as const },
+                { key: 'light' as const, label: 'Light', icon: 'contrast' as const },
               ]).map((opt) => (
                 <Pressable
                   key={opt.key}
@@ -233,11 +232,9 @@ export default function SettingsScreen() {
               ))}
             </View>
             <Text className="text-xs mt-2" style={{ color: colors.textMuted }}>
-              {skyTheme === 'dynamic'
-                ? 'Background shifts with time of day — dawn, day, dusk, night'
-                : skyTheme === 'light'
-                  ? 'Classic warm cream theme'
-                  : 'Always-dark sky with twinkling stars'}
+              {skyTheme === 'light'
+                ? 'Classic warm cream theme'
+                : 'Always-dark sky with twinkling stars'}
             </Text>
           </View>
 

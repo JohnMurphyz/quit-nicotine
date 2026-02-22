@@ -1,4 +1,5 @@
 import { AnimatedSkyBackground } from '@/src/components/AnimatedSkyBackground';
+import { ScreenTitle } from '@/src/components/ScreenTitle';
 import { useThemeColors } from '@/src/hooks/useThemeColors';
 import { supabase } from '@/src/lib/supabase';
 import { useAuthStore } from '@/src/stores/authStore';
@@ -220,9 +221,9 @@ export function PartnerDashboardScreen() {
                         <Text style={{ fontSize: 13, fontWeight: '700', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 4 }}>
                             Dashboard
                         </Text>
-                        <Text style={{ fontSize: 32, fontWeight: '800', color: colors.textPrimary, letterSpacing: -1 }}>
+                        <ScreenTitle style={{ fontSize: 32, letterSpacing: -1 }}>
                             {name}'s Journey
-                        </Text>
+                        </ScreenTitle>
                     </View>
                     <Pressable onPress={handleLeave} style={({ pressed }) => ({
                         padding: 10,

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export type SkyTheme = 'static' | 'dynamic' | 'light';
+export type SkyTheme = 'static' | 'light';
 
 const KEY = 'sky_theme';
 
@@ -18,7 +18,7 @@ export const useSkyThemeStore = create<SkyThemeStore>((set) => ({
 
   load: async () => {
     const stored = await AsyncStorage.getItem(KEY);
-    if (stored === 'static' || stored === 'dynamic' || stored === 'light') {
+    if (stored === 'static' || stored === 'light') {
       set({ theme: stored, loaded: true });
     } else {
       set({ loaded: true });

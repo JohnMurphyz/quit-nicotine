@@ -1,5 +1,6 @@
 import { AnimatedSkyBackground } from '@/src/components/AnimatedSkyBackground';
 import { BreathingOrb } from '@/src/components/BreathingOrb';
+import { ScreenTitle } from '@/src/components/ScreenTitle';
 import { useSound } from '@/src/hooks/useSound';
 import { useThemeColors } from '@/src/hooks/useThemeColors';
 import { SOUNDS, type SoundId } from '@/src/utils/soundGenerators';
@@ -94,7 +95,7 @@ export default function RelaxationScreen() {
           >
             <Ionicons name="arrow-back" size={22} color={colors.textPrimary} />
           </Pressable>
-          <Text style={{ fontSize: 24, fontWeight: '700', color: colors.textPrimary }}>Relax</Text>
+          <ScreenTitle>Relax</ScreenTitle>
         </View>
 
         <ScrollView

@@ -1,8 +1,10 @@
 import AccountabilityScreen from '@/src/screens/AccountabilityScreen';
 import ArticlesScreen from '@/src/screens/ArticlesScreen';
+import ContactUsScreen from '@/src/screens/ContactUsScreen';
 import ContentDetailScreen from '@/src/screens/ContentDetailScreen';
 import CravingSOSScreen from '@/src/screens/CravingSOSScreen';
 import DestroyProductsScreen from '@/src/screens/DestroyProductsScreen';
+import FeedbackScreen from '@/src/screens/FeedbackScreen';
 import MotivationScreen from '@/src/screens/MotivationScreen';
 import RelaxationScreen from '@/src/screens/RelaxationScreen';
 import RelapseWizardScreen from '@/src/screens/RelapseWizardScreen';
@@ -102,6 +104,16 @@ export function AppNavigator() {
       <Stack.Screen
         name="InvitePreview"
         component={InviteScreen as any}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Feedback"
+        component={FeedbackScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ContactUs"
+        component={ContactUsScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

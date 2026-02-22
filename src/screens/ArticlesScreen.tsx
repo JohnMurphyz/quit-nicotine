@@ -1,5 +1,6 @@
 import { AnimatedSkyBackground } from '@/src/components/AnimatedSkyBackground';
 import { ArticleCard } from '@/src/components/ArticleCard';
+import { ScreenTitle } from '@/src/components/ScreenTitle';
 import { useThemeColors } from '@/src/hooks/useThemeColors';
 import type { AppStackParamList } from '@/src/navigation/types';
 import { CONTENT_ITEMS } from '@/src/screens/tabs/ContentScreen';
@@ -95,7 +96,7 @@ export default function ArticlesScreen() {
           >
             <Ionicons name="arrow-back" size={22} color={colors.textPrimary} />
           </Pressable>
-          <Text style={{ fontSize: 24, fontWeight: '700', color: colors.textPrimary }}>Articles</Text>
+          <ScreenTitle>Articles</ScreenTitle>
         </View>
 
         <ScrollView

@@ -67,8 +67,8 @@ export default function JournalEntryScreen() {
               value={title}
               onChangeText={setTitle}
               style={{
+                fontFamily: 'AbrilFatface_400Regular', // Explicit font since TextInput doesn't wrap gracefully
                 fontSize: 28,
-                fontWeight: '700',
                 color: colors.textPrimary,
                 paddingVertical: 12,
               }}

@@ -10,6 +10,7 @@ import { HomeTodoCard } from '@/src/components/HomeTodoCard';
 import { MeditateModal } from '@/src/components/MeditateModal';
 import { PledgeModal } from '@/src/components/PledgeModal';
 import { RelapseModal } from '@/src/components/RelapseModal';
+import { ScreenTitle } from '@/src/components/ScreenTitle';
 import { StreakCelebrationModal } from '@/src/components/StreakCelebrationModal';
 import { SymptomSelectorModal } from '@/src/components/SymptomSelectorModal';
 import { useCheckInInterval } from '@/src/hooks/useCheckInInterval';
@@ -28,7 +29,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { differenceInDays, differenceInHours, differenceInMinutes } from 'date-fns';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
-import Animated, { LinearTransition } from 'react-native-reanimated';
+import Animated, { Easing, FadeInDown, LinearTransition } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Nav = CompositeNavigationProp<
@@ -124,8 +125,8 @@ export default function HomeScreen() {
     <AnimatedSkyBackground>
       <SafeAreaView className="flex-1" edges={['top']}>
         {/* Header — app title + streak flame badge */}
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingTop: 12, paddingBottom: 4 }}>
-          <Text style={{ fontSize: 24, fontWeight: '700', color: colors.textPrimary }}>FREED</Text>
+        <View className="flex-row items-center justify-between px-5 pt-4 pb-2">
+          <ScreenTitle>FREED</ScreenTitle>
           <Pressable
             onPress={() => {
               setCelebrationStreak(streak?.current_streak ?? 0);
@@ -147,7 +148,9 @@ export default function HomeScreen() {
         </View>
 
         {/* Day Streak Row */}
-        <DayStreakRow confirmations={confirmations} />
+        <Animated.View entering={FadeInDown.delay(100).duration(600).easing(Easing.out(Easing.cubic))}>
+          <DayStreakRow confirmations={confirmations} />
+        </Animated.View>
 
         {/* Main content */}
         <ScrollView
@@ -156,12 +159,12 @@ export default function HomeScreen() {
           showsVerticalScrollIndicator={false}
         >
           {/* Breathing Orb */}
-          <View style={{ alignItems: 'center', paddingTop: 16 }}>
+          <Animated.View entering={FadeInDown.delay(200).duration(600).easing(Easing.out(Easing.cubic))} style={{ alignItems: 'center', paddingTop: 16 }}>
             <BreathingOrb size={160} />
-          </View>
+          </Animated.View>
 
           {/* Timer display */}
-          <View style={{ alignItems: 'center', paddingVertical: 16 }}>
+          <Animated.View entering={FadeInDown.delay(300).duration(600).easing(Easing.out(Easing.cubic))} style={{ alignItems: 'center', paddingVertical: 16 }}>
             <Text style={{ fontSize: 13, color: colors.textMuted, fontWeight: '600', marginBottom: 4, letterSpacing: 0.5 }}>
               You've been nicotine-free for
             </Text>
@@ -173,37 +176,43 @@ export default function HomeScreen() {
                 {quitDuration?.hours ?? 0}hr {quitDuration?.minutes ?? 0}m
               </Text>
             </View>
-          </View>
+          </Animated.View>
 
           {/* Action buttons */}
-          <ActionButtonRow buttons={actionButtons} />
+          <Animated.View entering={FadeInDown.delay(400).duration(600).easing(Easing.out(Easing.cubic))}>
+            <ActionButtonRow buttons={actionButtons} />
+          </Animated.View>
 
           {/* Panic Button */}
-          <Pressable
-            onPress={() => navigation.navigate('CravingSOS')}
-            style={{ marginHorizontal: 16, marginTop: 8, backgroundColor: '#ef4444', borderRadius: 16, padding: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}
-          >
-            <Ionicons name="alert-circle" size={22} color="white" />
-            <Text style={{ color: 'white', fontWeight: '700', fontSize: 17 }}>Panic Button</Text>
-          </Pressable>
+          <Animated.View entering={FadeInDown.delay(500).duration(600).easing(Easing.out(Easing.cubic))}>
+            <Pressable
+              onPress={() => navigation.navigate('CravingSOS')}
+              style={{ marginHorizontal: 16, marginTop: 8, backgroundColor: '#ef4444', borderRadius: 16, padding: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+            >
+              <Ionicons name="alert-circle" size={22} color="white" />
+              <Text style={{ color: 'white', fontWeight: '700', fontSize: 17 }}>Panic Button</Text>
+            </Pressable>
+          </Animated.View>
 
           {/* To-do checklist */}
           {profile && (
-            <HomeTodoCard
-              profile={profile}
-              notificationsEnabled={notificationsEnabled}
-              hasJournalEntries={entries.length > 0}
-              onSetGoals={() => setBenefitSelectorVisible(true)}
-              onTrackSymptoms={() => setSymptomSelectorVisible(true)}
-              onEnableNotifications={requestPermission}
-              onAddPartner={() => navigation.navigate('Accountability')}
-              onDestroyProducts={() => navigation.navigate('DestroyProducts')}
-              onWriteJournal={() => navigation.navigate('JournalEntry', {})}
-            />
+            <Animated.View entering={FadeInDown.delay(600).duration(600).easing(Easing.out(Easing.cubic))}>
+              <HomeTodoCard
+                profile={profile}
+                notificationsEnabled={notificationsEnabled}
+                hasJournalEntries={entries.length > 0}
+                onSetGoals={() => setBenefitSelectorVisible(true)}
+                onTrackSymptoms={() => setSymptomSelectorVisible(true)}
+                onEnableNotifications={requestPermission}
+                onAddPartner={() => navigation.navigate('Accountability')}
+                onDestroyProducts={() => navigation.navigate('DestroyProducts')}
+                onWriteJournal={() => navigation.navigate('JournalEntry', {})}
+              />
+            </Animated.View>
           )}
 
           {/* Main navigation */}
-          <Animated.View layout={LinearTransition.duration(300)}>
+          <Animated.View layout={LinearTransition.duration(300)} entering={FadeInDown.delay(700).duration(600).easing(Easing.out(Easing.cubic))}>
             <HomeMainCard
               onNavigate={(screen) => {
                 const tabScreens = ['Learn', 'Timeline'];

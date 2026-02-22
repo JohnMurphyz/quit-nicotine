@@ -1,4 +1,5 @@
 import { AnimatedSkyBackground } from '@/src/components/AnimatedSkyBackground';
+import { ScreenTitle } from '@/src/components/ScreenTitle';
 import { useThemeColors } from '@/src/hooks/useThemeColors';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -67,7 +68,7 @@ export default function MotivationScreen() {
           >
             <Ionicons name="arrow-back" size={22} color={colors.textPrimary} />
           </Pressable>
-          <Text style={{ fontSize: 24, fontWeight: '700', color: colors.textPrimary }}>Motivation</Text>
+          <ScreenTitle>Motivation</ScreenTitle>
         </View>
 
         <ScrollView
