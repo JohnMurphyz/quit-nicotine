@@ -1,20 +1,21 @@
-import { useState } from 'react';
-import { View, Text, KeyboardAvoidingView, Platform, Alert, Pressable } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useAuthStore } from '@/src/stores/authStore';
 import { Button } from '@/src/components/ui/Button';
 import { Input } from '@/src/components/ui/Input';
-import type { OnboardingStackParamList } from '@/src/navigation/types';
-
-type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'Login'>;
+import { AuthStackParamList } from '@/src/navigation/types';
+import { useAuthStore } from '@/src/stores/authStore';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useState } from 'react';
+import { Alert, KeyboardAvoidingView, Platform, Pressable, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const DEV_EMAIL = 'test@quitnicotine.dev';
 const DEV_PASSWORD = 'testtest123';
 
 export default function LoginScreen() {
-  const navigation = useNavigation<Nav>();
+  const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList, 'Login'>>();
+
+  // Also pre-fetch the root navigation to reset to Auth stack
+  const rootNavigation = useNavigation<NativeStackNavigationProp<any>>();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { signIn, signUp, loading } = useAuthStore();
@@ -27,6 +28,10 @@ export default function LoginScreen() {
 
     try {
       await signIn(email, password);
+      rootNavigation.reset({
+        index: 0,
+        routes: [{ name: 'App' }],
+      });
     } catch (error: any) {
       Alert.alert('Login Failed', error.message ?? 'Something went wrong.');
     }
@@ -35,10 +40,18 @@ export default function LoginScreen() {
   const handleDevSignIn = async () => {
     try {
       await signIn(DEV_EMAIL, DEV_PASSWORD);
+      rootNavigation.reset({
+        index: 0,
+        routes: [{ name: 'App' }],
+      });
     } catch {
       // Account doesn't exist yet — create it
       try {
         await signUp(DEV_EMAIL, DEV_PASSWORD, 'Test User');
+        rootNavigation.reset({
+          index: 0,
+          routes: [{ name: 'App' }],
+        });
       } catch (error: any) {
         Alert.alert('Dev Sign In Failed', error.message ?? 'Something went wrong.');
       }
@@ -88,7 +101,7 @@ export default function LoginScreen() {
 
         <View className="flex-row justify-center mt-6">
           <Text className="text-warm-400">Don't have an account? </Text>
-          <Pressable onPress={() => navigation.navigate('Welcome')}>
+          <Pressable onPress={() => navigation.navigate('Signup')}>
             <Text className="text-warm-700 font-semibold">Get Started</Text>
           </Pressable>
         </View>

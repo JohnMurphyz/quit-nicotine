@@ -1,20 +1,30 @@
-import { useEffect } from 'react';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import type { OnboardingStackParamList } from './types';
-import WelcomeScreen from '@/src/screens/onboarding/WelcomeScreen';
-import NicotineTypeScreen from '@/src/screens/onboarding/NicotineTypeScreen';
-import UsageLevelScreen from '@/src/screens/onboarding/UsageLevelScreen';
-import CostQuitDateScreen from '@/src/screens/onboarding/CostQuitDateScreen';
-import ReadinessScreen from '@/src/screens/onboarding/ReadinessScreen';
-import CurrentStatusScreen from '@/src/screens/onboarding/CurrentStatusScreen';
-import DestroyItScreen from '@/src/screens/onboarding/DestroyItScreen';
-import MindsetCommitmentScreen from '@/src/screens/onboarding/MindsetCommitmentScreen';
-import MotivationsScreen from '@/src/screens/onboarding/MotivationsScreen';
-import LecturePreferenceScreen from '@/src/screens/onboarding/LecturePreferenceScreen';
-import AccountCreationScreen from '@/src/screens/onboarding/AccountCreationScreen';
-import LoginScreen from '@/src/screens/auth/LoginScreen';
-import InviteScreen from '@/src/screens/auth/InviteScreen';
 import { useOnboardingStore } from '@/src/stores/onboardingStore';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useEffect } from 'react';
+import type { OnboardingStackParamList } from './types';
+
+// Phase 1
+import WalkthroughDrugScreen from '@/src/screens/onboarding/phase1/WalkthroughDrugScreen';
+import WalkthroughFeaturesScreen from '@/src/screens/onboarding/phase1/WalkthroughFeaturesScreen';
+import WalkthroughRecoveryScreen from '@/src/screens/onboarding/phase1/WalkthroughRecoveryScreen';
+import WelcomeScreen from '@/src/screens/onboarding/phase1/WelcomeScreen';
+
+// Phase 2
+import QuizFrequencyCostScreen from '@/src/screens/onboarding/phase2/QuizFrequencyCostScreen';
+import QuizNicotineTypeScreen from '@/src/screens/onboarding/phase2/QuizNicotineTypeScreen';
+import QuizPastAttemptsScreen from '@/src/screens/onboarding/phase2/QuizPastAttemptsScreen';
+import QuizTriggersScreen from '@/src/screens/onboarding/phase2/QuizTriggersScreen';
+import QuizWhyScreen from '@/src/screens/onboarding/phase2/QuizWhyScreen';
+
+// Phase 3
+import AnalysisLoadingScreen from '@/src/screens/onboarding/phase3/AnalysisLoadingScreen';
+import PaywallScreen from '@/src/screens/onboarding/phase3/PaywallScreen';
+import ValueRevealScreen from '@/src/screens/onboarding/phase3/ValueRevealScreen';
+
+// Phase 4
+import AuthCreationScreen from '@/src/screens/onboarding/phase4/AuthCreationScreen';
+import FinalPledgeScreen from '@/src/screens/onboarding/phase4/FinalPledgeScreen';
+import SetQuitDateScreen from '@/src/screens/onboarding/phase4/SetQuitDateScreen';
 
 const Stack = createNativeStackNavigator<OnboardingStackParamList>();
 
@@ -27,24 +37,54 @@ export function OnboardingNavigator() {
 
   return (
     <Stack.Navigator
+      initialRouteName="Welcome"
       screenOptions={{
         headerShown: false,
-        animation: 'slide_from_right',
+        animation: 'fade', // Better for high-end feel than slide
       }}
     >
+      {/* Phase 1: Walkthrough Setup */}
       <Stack.Screen name="Welcome" component={WelcomeScreen} />
-      <Stack.Screen name="NicotineType" component={NicotineTypeScreen} />
-      <Stack.Screen name="UsageLevel" component={UsageLevelScreen} />
-      <Stack.Screen name="CostQuitDate" component={CostQuitDateScreen} />
-      <Stack.Screen name="Readiness" component={ReadinessScreen} />
-      <Stack.Screen name="CurrentStatus" component={CurrentStatusScreen} />
-      <Stack.Screen name="DestroyIt" component={DestroyItScreen} />
-      <Stack.Screen name="MindsetCommitment" component={MindsetCommitmentScreen} />
-      <Stack.Screen name="Motivations" component={MotivationsScreen} />
-      <Stack.Screen name="LecturePreference" component={LecturePreferenceScreen} />
-      <Stack.Screen name="AccountCreation" component={AccountCreationScreen} />
-      <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="Invite" component={InviteScreen} />
+      <Stack.Screen name="WalkthroughDrug" component={WalkthroughDrugScreen} options={{ animation: 'slide_from_right' }} />
+      <Stack.Screen name="WalkthroughRecovery" component={WalkthroughRecoveryScreen} options={{ animation: 'slide_from_right' }} />
+      <Stack.Screen name="WalkthroughFeatures" component={WalkthroughFeaturesScreen} options={{ animation: 'slide_from_right' }} />
+
+      {/* Phase 2: Quiz */}
+      <Stack.Screen
+        name="QuizNicotineType"
+        component={QuizNicotineTypeScreen}
+        options={{ animation: 'slide_from_right' }} // Slide for quiz flow
+      />
+      <Stack.Screen
+        name="QuizFrequencyCost"
+        component={QuizFrequencyCostScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <Stack.Screen
+        name="QuizWhy"
+        component={QuizWhyScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <Stack.Screen
+        name="QuizTriggers"
+        component={QuizTriggersScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <Stack.Screen
+        name="QuizPastAttempts"
+        component={QuizPastAttemptsScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+
+      {/* Phase 3: Value & Paywall */}
+      <Stack.Screen name="AnalysisLoading" component={AnalysisLoadingScreen} options={{ animation: 'fade' }} />
+      <Stack.Screen name="ValueReveal" component={ValueRevealScreen} />
+      <Stack.Screen name="Paywall" component={PaywallScreen} />
+
+      {/* Phase 4: Commitment */}
+      <Stack.Screen name="AuthCreation" component={AuthCreationScreen} />
+      <Stack.Screen name="SetQuitDate" component={SetQuitDateScreen} />
+      <Stack.Screen name="FinalPledge" component={FinalPledgeScreen} />
     </Stack.Navigator>
   );
 }

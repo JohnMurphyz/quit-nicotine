@@ -17,9 +17,10 @@ import { useAuthStore } from '@/src/stores/authStore';
 import { Ionicons } from '@expo/vector-icons';
 import { differenceInCalendarDays, differenceInMinutes } from 'date-fns';
 import { useEffect, useMemo, useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, { Easing, FadeInDown, LinearTransition } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 
 type ActiveTab = 'goals' | 'symptoms';
 
@@ -153,29 +154,42 @@ export default function TimelineScreen() {
 
   return (
     <AnimatedSkyBackground>
-      <SafeAreaView className="flex-1" edges={['top']}>
-        {/* Header */}
-        <View className="flex-row items-center justify-between px-5 pt-4 pb-2">
-          <ScreenTitle>Recovery</ScreenTitle>
-          <Pressable
-            onPress={() => setMilestoneModalVisible(true)}
-            style={{
-              flexDirection: 'row', alignItems: 'center', gap: 6,
-              backgroundColor: colors.isDark ? 'rgba(160,150,220,0.12)' : 'rgba(140,122,102,0.08)',
-              paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20,
-            }}
-          >
-            <Ionicons name="flag" size={16} color={colors.isDark ? '#c4b5fd' : '#8c7a66'} />
-            <Text
-              style={{
-                fontSize: 14,
-                fontWeight: '700',
-                color: colors.textSecondary,
-              }}
-            >
-              {daysFree}d
-            </Text>
-          </Pressable>
+      <View className="flex-1">
+        {/* Hero Image - full bleed to top edge */}
+        <View style={{ height: 220, marginTop: -10 }}>
+          <Image
+            source={require('@/assets/images/scene-sunrise-hero.png')}
+            style={{ width: '100%', height: '100%' }}
+            resizeMode="cover"
+          />
+          <LinearGradient
+            colors={['transparent', '#0d0b2e']}
+            style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 60 }}
+          />
+          <SafeAreaView className="absolute top-0 left-0 right-0" edges={['top']}>
+            <View className="flex-row items-center justify-between px-5 pt-4 pb-2">
+              <ScreenTitle>Recovery</ScreenTitle>
+              <Pressable
+                onPress={() => setMilestoneModalVisible(true)}
+                style={{
+                  flexDirection: 'row', alignItems: 'center', gap: 6,
+                  backgroundColor: 'rgba(255,255,255,0.15)',
+                  paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20,
+                }}
+              >
+                <Ionicons name="flag" size={16} color="#c4b5fd" />
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontWeight: '700',
+                    color: 'rgba(255,255,255,0.9)',
+                  }}
+                >
+                  {daysFree}d
+                </Text>
+              </Pressable>
+            </View>
+          </SafeAreaView>
         </View>
 
         <ScrollView className="flex-1 px-4 pt-6" contentContainerClassName="pb-12">
@@ -371,7 +385,7 @@ export default function TimelineScreen() {
           description={latestAchievementDesc}
           iconName={latestAchievementIcon}
         />
-      </SafeAreaView>
+      </View>
     </AnimatedSkyBackground>
   );
 }

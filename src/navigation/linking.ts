@@ -8,8 +8,8 @@ export const linking: LinkingOptions<RootStackParamList> = {
     screens: {
       Onboarding: {
         screens: {
-          Welcome: 'onboarding',
-          Invite: 'invite/:code',
+          Welcome: 'welcome',
+          AuthCreation: 'signup',
         },
       },
       App: {

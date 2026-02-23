@@ -1,6 +1,6 @@
-import { create } from 'zustand';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { NicotineType, UsageDetails } from '@/src/types';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { create } from 'zustand';
 
 const STORAGE_KEY = 'onboarding_data';
 
@@ -17,6 +17,10 @@ interface OnboardingData {
   specificBenefit: string | null;
   supportPerson: string | null;
   wantsLecture: boolean | null;
+
+  // New Quiz Fields
+  triggers: string[];
+  pastAttempts: string | null;
 }
 
 interface OnboardingState extends OnboardingData {
@@ -42,6 +46,10 @@ interface OnboardingState extends OnboardingData {
   persist: () => Promise<void>;
   loadPersisted: () => Promise<void>;
   reset: () => void;
+
+  // New Quiz Setters
+  setTriggers: (triggers: string[]) => void;
+  setPastAttempts: (attempts: string) => void;
 }
 
 const initialData: OnboardingData = {
@@ -57,6 +65,8 @@ const initialData: OnboardingData = {
   specificBenefit: null,
   supportPerson: null,
   wantsLecture: null,
+  triggers: [],
+  pastAttempts: null,
 };
 
 export const useOnboardingStore = create<OnboardingState>((set, get) => ({
@@ -141,7 +151,18 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
       specificBenefit: s.specificBenefit,
       supportPerson: s.supportPerson,
       wantsLecture: s.wantsLecture,
+      triggers: s.triggers,
+      pastAttempts: s.pastAttempts,
     };
+  },
+
+  setTriggers: (triggers) => {
+    set({ triggers });
+    get().persist();
+  },
+  setPastAttempts: (attempts) => {
+    set({ pastAttempts: attempts });
+    get().persist();
   },
 
   persist: async () => {

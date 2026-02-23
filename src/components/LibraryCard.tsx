@@ -1,8 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, { Easing, FadeInDown } from 'react-native-reanimated';
-import Svg, { Circle, Path, Polygon } from 'react-native-svg';
+import Svg, { Circle, Ellipse, Line, Path } from 'react-native-svg';
 
 type CardType = 'articles' | 'relaxation' | 'breathe' | 'journal' | 'motivation';
 
@@ -15,67 +14,75 @@ interface LibraryCardProps {
 
 const CARD_CONFIG = {
     articles: {
-        colors: ['#FF6B6B', '#FF8E53', '#FFAE3D'] as const,
+        accentColor: '#F6A623',
+        tint: 'rgba(246,166,35,0.22)',
         icon: 'document-text-outline' as const,
-        renderVector: () => (
+        renderDecor: (color: string) => (
             <Svg height="100%" width="100%" style={StyleSheet.absoluteFill}>
-                <Path fill="#ffffff" opacity={0.1} d="M-20,150 Q60,80 120,100 T300,50 L300,160 L-20,160 Z" />
-                <Path fill="#ffffff" opacity={0.15} d="M-20,160 Q80,120 160,110 T300,70 L300,160 L-20,160 Z" />
-                <Path fill="#ffffff" opacity={0.05} d="M80,0 Q150,50 200,20 T300,40 L300,0 L80,0 Z" />
-                <Circle cx="250" cy="-20" r="100" fill="#ffffff" opacity={0.1} />
+                {/* Stacked page lines */}
+                <Line x1="65%" y1="20%" x2="92%" y2="20%" stroke={color} strokeWidth="2" opacity={0.3} strokeLinecap="round" />
+                <Line x1="60%" y1="38%" x2="95%" y2="38%" stroke={color} strokeWidth="2" opacity={0.2} strokeLinecap="round" />
+                <Line x1="68%" y1="56%" x2="90%" y2="56%" stroke={color} strokeWidth="2" opacity={0.15} strokeLinecap="round" />
+                <Line x1="62%" y1="74%" x2="88%" y2="74%" stroke={color} strokeWidth="2" opacity={0.1} strokeLinecap="round" />
+                <Circle cx="95%" cy="75%" r="12" fill={color} opacity={0.08} />
             </Svg>
         ),
     },
     relaxation: {
-        colors: ['#4A00E0', '#8E2DE2', '#C026D3'] as const,
+        accentColor: '#C78BFA',
+        tint: 'rgba(139,92,246,0.22)',
         icon: 'moon-outline' as const,
-        renderVector: () => (
+        renderDecor: (color: string) => (
             <Svg height="100%" width="100%" style={StyleSheet.absoluteFill}>
-                <Path fill="none" stroke="#fff" strokeWidth="4" opacity={0.1} d="M-50,80 Q50,0 150,100 T350,20" />
-                <Path fill="none" stroke="#fff" strokeWidth="2" opacity={0.15} d="M-50,100 Q60,30 140,120 T350,40" />
-                <Path fill="none" stroke="#fff" strokeWidth="6" opacity={0.05} d="M-50,60 Q40,-20 160,80 T350,0" />
-                <Circle cx="200" cy="120" r="40" fill="#fff" opacity={0.1} />
-                <Circle cx="250" cy="90" r="20" fill="#fff" opacity={0.15} />
-                <Circle cx="30" cy="30" r="60" fill="#fff" opacity={0.05} />
+                {/* Crescent moon + stars */}
+                <Circle cx="78%" cy="50%" r="14" fill={color} opacity={0.15} />
+                <Circle cx="82%" cy="42%" r="12" fill="rgba(13,11,46,0.9)" />
+                <Circle cx="68%" cy="25%" r="2" fill={color} opacity={0.35} />
+                <Circle cx="90%" cy="30%" r="1.5" fill={color} opacity={0.25} />
+                <Circle cx="62%" cy="70%" r="1.5" fill={color} opacity={0.2} />
+                <Circle cx="95%" cy="65%" r="2" fill={color} opacity={0.3} />
             </Svg>
         ),
     },
     breathe: {
-        colors: ['#0093E9', '#00C9A7'] as const,
+        accentColor: '#E8845C',
+        tint: 'rgba(232,132,92,0.22)',
         icon: 'leaf-outline' as const,
-        renderVector: () => (
+        renderDecor: (color: string) => (
             <Svg height="100%" width="100%" style={StyleSheet.absoluteFill}>
-                <Circle cx="150" cy="150" r="140" fill="none" stroke="#fff" strokeWidth="2" opacity={0.05} />
-                <Circle cx="150" cy="150" r="100" fill="none" stroke="#fff" strokeWidth="2" opacity={0.08} />
-                <Circle cx="150" cy="150" r="60" fill="none" stroke="#fff" strokeWidth="3" opacity={0.12} />
-                <Circle cx="150" cy="150" r="20" fill="#fff" opacity={0.15} />
-                <Polygon points="0,150 200,-50 250,-50 0,200" fill="#fff" opacity={0.05} />
+                {/* Concentric breath rings */}
+                <Circle cx="80%" cy="50%" r="24" fill="none" stroke={color} strokeWidth="1.5" opacity={0.1} />
+                <Circle cx="80%" cy="50%" r="16" fill="none" stroke={color} strokeWidth="1.5" opacity={0.18} />
+                <Circle cx="80%" cy="50%" r="8" fill="none" stroke={color} strokeWidth="1.5" opacity={0.25} />
+                <Circle cx="80%" cy="50%" r="3" fill={color} opacity={0.2} />
             </Svg>
         ),
     },
     journal: {
-        colors: ['#1A2980', '#26D0CE'] as const,
+        accentColor: '#22D3EE',
+        tint: 'rgba(34,211,238,0.22)',
         icon: 'journal-outline' as const,
-        renderVector: () => (
+        renderDecor: (color: string) => (
             <Svg height="100%" width="100%" style={StyleSheet.absoluteFill}>
-                <Polygon points="-20,150 80,40 160,150" fill="#fff" opacity={0.08} />
-                <Polygon points="80,40 200,90 160,150" fill="#fff" opacity={0.12} />
-                <Polygon points="200,90 300,20 320,150 160,150" fill="#fff" opacity={0.05} />
-                <Polygon points="20,0 80,40 -20,150 -20,0" fill="#fff" opacity={0.03} />
-                <Polygon points="80,40 200,0 300,20" fill="#fff" opacity={0.07} />
+                {/* Wavy sound / water lines */}
+                <Path d="M60,20 Q70,14 80,20 T100,20 T120,20 T140,20" fill="none" stroke={color} strokeWidth="1.5" opacity={0.25} />
+                <Path d="M55,32 Q67,25 79,32 T103,32 T127,32 T151,32" fill="none" stroke={color} strokeWidth="1.5" opacity={0.18} />
+                <Path d="M62,44 Q72,38 82,44 T102,44 T122,44 T142,44" fill="none" stroke={color} strokeWidth="1.5" opacity={0.12} />
             </Svg>
         ),
     },
     motivation: {
-        colors: ['#F59E0B', '#EF4444', '#F97316'] as const,
+        accentColor: '#F472B6',
+        tint: 'rgba(244,114,182,0.22)',
         icon: 'flame-outline' as const,
-        renderVector: () => (
+        renderDecor: (color: string) => (
             <Svg height="100%" width="100%" style={StyleSheet.absoluteFill}>
-                <Path fill="#ffffff" opacity={0.1} d="M-20,160 Q40,100 100,130 T250,80 L300,160 L-20,160 Z" />
-                <Path fill="#ffffff" opacity={0.15} d="M-20,160 Q60,120 140,140 T300,100 L300,160 L-20,160 Z" />
-                <Circle cx="240" cy="30" r="50" fill="#ffffff" opacity={0.08} />
-                <Circle cx="260" cy="50" r="30" fill="#ffffff" opacity={0.12} />
-                <Path fill="#ffffff" opacity={0.06} d="M150,0 Q180,60 220,40 T300,0 L150,0 Z" />
+                {/* Rising flame / spark shapes */}
+                <Ellipse cx="82%" cy="65%" rx="8" ry="14" fill={color} opacity={0.12} />
+                <Ellipse cx="82%" cy="55%" rx="5" ry="10" fill={color} opacity={0.18} />
+                <Circle cx="75%" cy="30%" r="2" fill={color} opacity={0.3} />
+                <Circle cx="88%" cy="22%" r="1.5" fill={color} opacity={0.2} />
+                <Circle cx="80%" cy="15%" r="1" fill={color} opacity={0.15} />
             </Svg>
         ),
     },
@@ -83,7 +90,6 @@ const CARD_CONFIG = {
 
 export function LibraryCard({ type, title, onPress, index }: LibraryCardProps) {
     const config = CARD_CONFIG[type];
-    const gradientColors = config.colors as unknown as readonly [string, string, ...string[]];
 
     return (
         <Animated.View entering={FadeInDown.delay(100 + index * 100).duration(600).easing(Easing.out(Easing.cubic))} style={{ flex: 1 }}>
@@ -96,52 +102,42 @@ export function LibraryCard({ type, title, onPress, index }: LibraryCardProps) {
                     transform: [{ scale: pressed ? 0.96 : 1 }],
                 })}
             >
-                <LinearGradient
-                    colors={gradientColors}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
+                <View
                     style={{
                         flex: 1,
                         width: '100%',
-                        minHeight: 160,
-                        borderRadius: 28, // High-end rounded rectangle squircle
+                        height: 64,
+                        borderRadius: 16,
                         overflow: 'hidden',
-                        padding: 20,
-                        justifyContent: 'space-between',
+                        paddingHorizontal: 18,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        backgroundColor: config.tint,
+                        borderWidth: 1,
+                        borderColor: 'rgba(255,255,255,0.1)',
                     }}
                 >
-                    <View style={{ ...StyleSheet.absoluteFillObject, borderRadius: 28, overflow: 'hidden' }}>
-                        {config.renderVector()}
+                    <View style={{ ...StyleSheet.absoluteFillObject }}>
+                        {config.renderDecor(config.accentColor)}
                     </View>
 
-                    {/* Top Icon Area showing premium glassmorphic backing */}
-                    <View style={{
-                        backgroundColor: 'rgba(255, 255, 255, 0.25)',
-                        width: 44,
-                        height: 44,
-                        borderRadius: 22,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                    }}>
-                        <Ionicons name={config.icon} size={24} color="#FFF" />
-                    </View>
+                    <Ionicons name={config.icon} size={20} color={config.accentColor} />
 
-                    {/* Bottom Title Area */}
                     <Text
                         style={{
+                            flex: 1,
                             color: 'white',
-                            fontSize: 22,
+                            fontSize: 15,
                             fontWeight: '700',
-                            letterSpacing: 0.5,
-                            zIndex: 10,
-                            textShadowColor: 'rgba(0,0,0,0.15)',
-                            textShadowOffset: { width: 0, height: 2 },
-                            textShadowRadius: 8,
+                            letterSpacing: 0.3,
+                            marginLeft: 12,
                         }}
                     >
                         {title}
                     </Text>
-                </LinearGradient>
+
+                    <Ionicons name="chevron-forward" size={16} color="rgba(255,255,255,0.4)" />
+                </View>
             </Pressable>
         </Animated.View>
     );

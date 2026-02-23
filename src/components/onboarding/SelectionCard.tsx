@@ -11,18 +11,30 @@ export function SelectionCard({ label, selected, dimmed, onPress }: SelectionCar
   return (
     <Pressable
       onPress={onPress}
-      className={`rounded-2xl py-5 px-6 ${
-        selected ? 'bg-warm-500' : 'bg-warm-100'
-      }`}
+      style={{
+        backgroundColor: selected
+          ? 'rgba(124,58,237,0.3)'
+          : 'rgba(160,150,220,0.08)',
+        borderWidth: 1,
+        borderColor: selected
+          ? '#7c3aed'
+          : 'rgba(160,150,220,0.18)',
+        borderRadius: 16,
+        paddingVertical: 20,
+        paddingHorizontal: 24,
+      }}
     >
       <Text
-        className={`text-lg font-medium text-center ${
-          selected
-            ? 'text-white'
+        style={{
+          fontSize: 18,
+          fontWeight: '500',
+          textAlign: 'center',
+          color: selected
+            ? '#ffffff'
             : dimmed
-              ? 'text-warm-300'
-              : 'text-warm-800'
-        }`}
+              ? 'rgba(255,255,255,0.3)'
+              : 'rgba(255,255,255,0.9)',
+        }}
       >
         {label}
       </Text>

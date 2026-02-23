@@ -7,19 +7,28 @@ export type AuthStackParamList = {
 };
 
 export type OnboardingStackParamList = {
+  // Phase 1: Walkthrough
   Welcome: undefined;
-  NicotineType: undefined;
-  UsageLevel: undefined;
-  CostQuitDate: undefined;
-  Readiness: undefined;
-  CurrentStatus: undefined;
-  DestroyIt: undefined;
-  MindsetCommitment: undefined;
-  Motivations: undefined;
-  LecturePreference: undefined;
-  AccountCreation: undefined;
-  Login: undefined;
-  Invite: { code: string };
+  WalkthroughDrug: undefined;
+  WalkthroughRecovery: undefined;
+  WalkthroughFeatures: undefined;
+
+  // Phase 2: Quiz
+  QuizNicotineType: undefined;
+  QuizFrequencyCost: undefined;
+  QuizWhy: undefined;
+  QuizTriggers: undefined;
+  QuizPastAttempts: undefined;
+
+  // Phase 3: Value & Paywall
+  AnalysisLoading: undefined;
+  ValueReveal: undefined;
+  Paywall: undefined;
+
+  // Phase 4: Commitment
+  AuthCreation: undefined;
+  SetQuitDate: undefined;
+  FinalPledge: undefined;
 };
 
 export type TabParamList = {

@@ -15,6 +15,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
 import { Alert, Image, Platform, Pressable, ScrollView, Share, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { INVITE_WEB_DOMAIN } from '@/src/constants/config';
 import { supabase } from '@/src/lib/supabase';
@@ -113,15 +114,23 @@ export default function ProfileScreen() {
 
   return (
     <AnimatedSkyBackground>
-      <SafeAreaView className="flex-1" edges={['top']}>
-        {/* Header */}
-        <View className="flex-row items-center justify-between px-5 pt-4 pb-2">
-          <ScreenTitle>Profile</ScreenTitle>
-          <Pressable onPress={() => navigation.navigate('Settings')}>
-            <Text style={{ fontSize: 16, fontWeight: '600', color: colors.textSecondary }}>
-              Settings
-            </Text>
-          </Pressable>
+      <View className="flex-1">
+        {/* Hero Image - full bleed to top edge */}
+        <View style={{ height: 220, marginTop: -10 }}>
+          <Image
+            source={require('@/assets/images/walkthrough-lighthouse-night.png')}
+            style={{ width: '100%', height: '100%' }}
+            resizeMode="cover"
+          />
+          <LinearGradient
+            colors={['transparent', '#0d0b2e']}
+            style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 60 }}
+          />
+          <SafeAreaView className="absolute top-0 left-0 right-0" edges={['top']}>
+            <View className="flex-row items-center justify-between px-5 pt-4 pb-2">
+              <ScreenTitle>Profile</ScreenTitle>
+            </View>
+          </SafeAreaView>
         </View>
 
         <ScrollView
@@ -360,13 +369,22 @@ export default function ProfileScreen() {
                 subtitle="Get in touch with the FREED team"
                 colors={colors}
                 onPress={() => navigation.navigate('ContactUs')}
+              />
+              <View style={{ height: 1, backgroundColor: colors.borderColor, marginHorizontal: 16 }} />
+              <MenuRow
+                icon="settings-sharp"
+                iconColor="#8b5cf6"
+                title="Settings"
+                subtitle="Preferences, notifications & account"
+                colors={colors}
+                onPress={() => navigation.navigate('Settings')}
                 isLast
               />
             </View>
           </View>
         </ScrollView>
 
-      </SafeAreaView>
+      </View>
     </AnimatedSkyBackground>
   );
 }

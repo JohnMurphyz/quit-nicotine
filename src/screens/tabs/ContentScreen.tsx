@@ -1,6 +1,7 @@
 import { AnimatedSkyBackground } from '@/src/components/AnimatedSkyBackground';
 import { LibraryCard } from '@/src/components/LibraryCard';
 import { MeditateModal } from '@/src/components/MeditateModal';
+import { LinearGradient } from 'expo-linear-gradient';
 import { ScreenTitle } from '@/src/components/ScreenTitle';
 import { useThemeColors } from '@/src/hooks/useThemeColors';
 import type { AppStackParamList } from '@/src/navigation/types';
@@ -152,14 +153,27 @@ export default function ContentScreen() {
 
   return (
     <AnimatedSkyBackground>
-      <SafeAreaView className="flex-1" edges={['top']}>
-        {/* Header */}
-        <View className="flex-row items-center justify-between px-5 pt-4 pb-2">
-          <ScreenTitle>Library</ScreenTitle>
+      <View className="flex-1">
+        {/* Hero Image - fixed at top */}
+        <View style={{ height: 220, marginTop: -10 }}>
+          <Image
+            source={require('@/assets/images/scene-desert-hero.png')}
+            style={{ width: '100%', height: '100%' }}
+            resizeMode="cover"
+          />
+          <LinearGradient
+            colors={['transparent', '#0d0b2e']}
+            style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 60 }}
+          />
+          <SafeAreaView className="absolute top-0 left-0 right-0" edges={['top']}>
+            <View className="flex-row items-center justify-between px-5 pt-4 pb-2">
+              <ScreenTitle>Library</ScreenTitle>
+            </View>
+          </SafeAreaView>
         </View>
 
         <ScrollView
-          className="flex-1 px-5 pt-6 pb-12"
+          className="flex-1 px-5 pt-4 pb-12"
           showsVerticalScrollIndicator={false}
         >
 
@@ -245,7 +259,7 @@ export default function ContentScreen() {
           visible={showMeditate}
           onClose={() => setShowMeditate(false)}
         />
-      </SafeAreaView>
+      </View>
     </AnimatedSkyBackground>
   );
 }
