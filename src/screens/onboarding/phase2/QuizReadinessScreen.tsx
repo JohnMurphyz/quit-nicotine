@@ -4,8 +4,8 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import * as Haptics from 'expo-haptics';
-import { useCallback, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { useCallback } from 'react';
+import { Image, Pressable, Text, View } from 'react-native';
 import Animated, {
     FadeIn,
     FadeInRight,
@@ -20,19 +20,17 @@ import { QuizProgressHeader } from './QuizProgressHeader';
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 const OPTIONS = [
-    { id: 'Health', icon: '❤️', label: 'My health', d: 'Breathe easier, live longer' },
-    { id: 'Money', icon: '💰', label: 'Save money', d: 'Stop burning cash on nicotine' },
-    { id: 'Family', icon: '👨‍👩‍👧', label: 'My family', d: 'Be present and healthy for them' },
-    { id: 'Freedom', icon: '🦅', label: 'Freedom', d: 'No more planning life around cravings' },
-    { id: 'Fitness', icon: '🏃', label: 'Fitness', d: 'Better workouts, faster recovery' },
-    { id: 'MentalClarity', icon: '🧠', label: 'Mental clarity', d: 'Less brain fog, more focus' },
+    { id: 4, icon: '🔥', label: 'Fully committed', d: "I'm done. No looking back." },
+    { id: 3, icon: '💪', label: 'Ready but nervous', d: "I know it'll be hard, but I'm in." },
+    { id: 2, icon: '🤔', label: 'Cautiously optimistic', d: "I want to try, but I'm not sure I can." },
+    { id: 1, icon: '🌱', label: 'Just exploring', d: "I'm not ready yet, but I'm curious." },
 ];
 
-function OptionCard({ opt, index, isSelected, onToggle }: {
+function OptionCard({ opt, index, isSelected, onSelect }: {
     opt: typeof OPTIONS[number];
     index: number;
     isSelected: boolean;
-    onToggle: (id: string) => void;
+    onSelect: (id: number) => void;
 }) {
     const scale = useSharedValue(1);
 
@@ -50,24 +48,26 @@ function OptionCard({ opt, index, isSelected, onToggle }: {
 
     return (
         <Animated.View
-            entering={FadeInRight.duration(500).delay(index * 80)}
+            entering={FadeInRight.duration(500).delay(index * 100)}
         >
             <AnimatedPressable
-                onPress={() => onToggle(opt.id)}
+                onPress={() => onSelect(opt.id)}
                 onPressIn={handlePressIn}
                 onPressOut={handlePressOut}
                 style={animatedStyle}
-                className={`flex-row items-center p-4 mb-3 rounded-2xl border ${isSelected
+                className={`flex-row items-center p-5 mb-3 rounded-2xl border ${isSelected
                     ? 'border-emerald-500 bg-emerald-500/15'
                     : 'border-white/10 bg-white/5'
                     }`}
             >
                 <Text className="text-3xl mr-4">{opt.icon}</Text>
                 <View className="flex-1">
-                    <Text className={`text-lg font-bold mb-0.5 ${isSelected ? 'text-emerald-400' : 'text-white'}`}>
+                    <Text className={`text-lg font-bold mb-1 ${isSelected ? 'text-emerald-400' : 'text-white'}`}>
                         {opt.label}
                     </Text>
-                    <Text className={`text-sm ${isSelected ? 'text-emerald-400/70' : 'text-white/40'}`}>{opt.d}</Text>
+                    <Text className={`text-sm ${isSelected ? 'text-emerald-400/70' : 'text-white/40'}`}>
+                        {opt.d}
+                    </Text>
                 </View>
                 {isSelected && (
                     <Animated.View entering={FadeIn.duration(200)}>
@@ -79,40 +79,39 @@ function OptionCard({ opt, index, isSelected, onToggle }: {
     );
 }
 
-export default function QuizWhyScreen() {
+export default function QuizReadinessScreen() {
     const navigation = useNavigation<NativeStackNavigationProp<OnboardingStackParamList>>();
-    const { motivations, setMotivations, setSpecificBenefit } = useOnboardingStore();
-    const [selected, setSelected] = useState<Set<string>>(new Set(motivations));
+    const { readinessLevel, setReadinessLevel } = useOnboardingStore();
 
-    const toggleOption = (id: string) => {
+    const handleSelect = (level: number) => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        const next = new Set(selected);
-        if (next.has(id)) next.delete(id);
-        else next.add(id);
-        setSelected(next);
-    };
-
-    const handleNext = () => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-        const arr = Array.from(selected);
-        setMotivations(arr);
-        setSpecificBenefit(arr[0] || null);
-        navigation.navigate('QuizTriggers');
+        setReadinessLevel(level);
+        setTimeout(() => {
+            navigation.navigate('PersonalizedResults');
+        }, 200);
     };
 
     return (
         <SafeAreaView className="flex-1 bg-dark-900 px-6 pt-4">
-            <QuizProgressHeader currentStep={3} totalSteps={5} />
+            <QuizProgressHeader currentStep={5} totalSteps={5} />
 
-            <Animated.View entering={FadeInUp.duration(600)}>
+            <Animated.View entering={FadeInUp.duration(500)}>
+                <Image
+                    source={require('@/assets/images/quiz-readiness-hero.png')}
+                    style={{ width: '100%', height: 140, borderRadius: 16, opacity: 0.85 }}
+                    resizeMode="cover"
+                />
+            </Animated.View>
+
+            <Animated.View entering={FadeInUp.duration(600)} style={{ marginTop: 16 }}>
                 <Text
                     style={{ fontFamily: 'AbrilFatface_400Regular', fontSize: 28 }}
                     className="text-white mb-2"
                 >
-                    What drives you?
+                    How ready do you feel?
                 </Text>
                 <Text className="text-base text-white/50 mb-8">
-                    Select everything that resonates. Your top pick powers your pledge.
+                    No wrong answer. We'll meet you where you are.
                 </Text>
             </Animated.View>
 
@@ -122,21 +121,11 @@ export default function QuizWhyScreen() {
                         key={opt.id}
                         opt={opt}
                         index={index}
-                        isSelected={selected.has(opt.id)}
-                        onToggle={toggleOption}
+                        isSelected={readinessLevel === opt.id}
+                        onSelect={handleSelect}
                     />
                 ))}
             </View>
-
-            <Animated.View entering={FadeInUp.duration(600).delay(400)} className="w-full pb-8">
-                <Pressable
-                    onPress={handleNext}
-                    disabled={selected.size === 0}
-                    className={`w-full h-14 rounded-2xl items-center justify-center ${selected.size > 0 ? 'bg-white active:opacity-80' : 'bg-white/20'}`}
-                >
-                    <Text className={`text-lg font-bold ${selected.size > 0 ? 'text-black' : 'text-white/40'}`}>Next</Text>
-                </Pressable>
-            </Animated.View>
         </SafeAreaView>
     );
 }

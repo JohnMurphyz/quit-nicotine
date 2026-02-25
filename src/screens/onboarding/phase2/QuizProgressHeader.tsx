@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
-import { Pressable, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
 
 interface Props {
@@ -27,12 +27,16 @@ export function QuizProgressHeader({ currentStep, totalSteps }: Props) {
                 <Ionicons name="arrow-back" size={24} color="rgba(255,255,255,0.6)" />
             </Pressable>
 
-            <View className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+            <View className="flex-1 h-[3px] bg-white/10 rounded-full overflow-hidden">
                 <Animated.View
                     className="h-full bg-emerald-500 rounded-full"
                     style={barStyle}
                 />
             </View>
+
+            <Text className="ml-3 text-xs text-white/40">
+                {currentStep} of {totalSteps}
+            </Text>
         </View>
     );
 }

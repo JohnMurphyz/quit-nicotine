@@ -1,16 +1,16 @@
-import { Input } from '@/src/components/ui/Input';
 import type { OnboardingStackParamList } from '@/src/navigation/types';
 import { useAuthStore } from '@/src/stores/authStore';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, Pressable, Text, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, Pressable, Text, TextInput, View } from 'react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function AuthCreationScreen() {
     const navigation = useNavigation<NativeStackNavigationProp<OnboardingStackParamList>>();
-    const { signIn, signUp, loading } = useAuthStore();
+    const { signIn, signUp, signInWithApple, signInWithGoogle, loading } = useAuthStore();
 
     const DEV_EMAIL = 'test@quitnicotine.dev';
     const DEV_PASSWORD = 'testtest123';
@@ -30,6 +30,24 @@ export default function AuthCreationScreen() {
             navigation.navigate('SetQuitDate');
         } catch (e: any) {
             Alert.alert('Error', e.message || 'Registration failed');
+        }
+    };
+
+    const handleAppleSignIn = async () => {
+        try {
+            await signInWithApple();
+            navigation.navigate('SetQuitDate');
+        } catch (e: any) {
+            Alert.alert('Error', e.message || 'Apple sign-in failed');
+        }
+    };
+
+    const handleGoogleSignIn = async () => {
+        try {
+            await signInWithGoogle();
+            navigation.navigate('SetQuitDate');
+        } catch (e: any) {
+            Alert.alert('Error', e.message || 'Google sign-in failed');
         }
     };
 
@@ -60,17 +78,44 @@ export default function AuthCreationScreen() {
                         style={{ fontFamily: 'AbrilFatface_400Regular', fontSize: 32 }}
                         className="text-white mb-2"
                     >
-                        Create Your Account
+                        Save your progress
                     </Text>
                     <Text className="text-base text-white/50 mb-8 leading-relaxed">
-                        Your plan is ready. Let's save your progress so you never lose it.
+                        Create an account so your journey, streaks, and savings are never lost.
                     </Text>
 
+                    {/* Social sign-in buttons */}
+                    <Pressable
+                        onPress={handleAppleSignIn}
+                        disabled={loading}
+                        className="w-full h-14 rounded-2xl items-center justify-center flex-row bg-white mb-3 active:opacity-80"
+                    >
+                        <Ionicons name="logo-apple" size={20} color="#000" style={{ marginRight: 8 }} />
+                        <Text className="text-black text-base font-bold">Continue with Apple</Text>
+                    </Pressable>
+
+                    <Pressable
+                        onPress={handleGoogleSignIn}
+                        disabled={loading}
+                        className="w-full h-14 rounded-2xl items-center justify-center flex-row bg-white/10 border border-white/10 mb-6 active:opacity-80"
+                    >
+                        <Ionicons name="logo-google" size={18} color="#fff" style={{ marginRight: 8 }} />
+                        <Text className="text-white text-base font-bold">Continue with Google</Text>
+                    </Pressable>
+
+                    {/* Divider */}
+                    <View className="flex-row items-center mb-6">
+                        <View className="flex-1 h-px bg-white/10" />
+                        <Text className="text-white/30 mx-4 text-sm">or</Text>
+                        <View className="flex-1 h-px bg-white/10" />
+                    </View>
+
+                    {/* Email form */}
                     <View className="mb-4">
                         <Text className="text-white/70 font-bold mb-2 ml-1">First Name</Text>
                         <View className="bg-white/8 border border-white/10 rounded-2xl px-4 h-14 justify-center">
-                            <Input
-                                style={{ borderWidth: 0, height: '100%', paddingHorizontal: 0, backgroundColor: 'transparent', color: '#fff' }}
+                            <TextInput
+                                style={{ height: '100%', backgroundColor: 'transparent', color: '#fff', fontSize: 16 }}
                                 placeholder="e.g. Alex"
                                 placeholderTextColor="rgba(255,255,255,0.3)"
                                 value={name}
@@ -83,8 +128,8 @@ export default function AuthCreationScreen() {
                     <View className="mb-4">
                         <Text className="text-white/70 font-bold mb-2 ml-1">Email Address</Text>
                         <View className="bg-white/8 border border-white/10 rounded-2xl px-4 h-14 justify-center">
-                            <Input
-                                style={{ borderWidth: 0, height: '100%', paddingHorizontal: 0, backgroundColor: 'transparent', color: '#fff' }}
+                            <TextInput
+                                style={{ height: '100%', backgroundColor: 'transparent', color: '#fff', fontSize: 16 }}
                                 placeholder="you@email.com"
                                 placeholderTextColor="rgba(255,255,255,0.3)"
                                 value={email}
@@ -98,8 +143,8 @@ export default function AuthCreationScreen() {
                     <View className="mb-4">
                         <Text className="text-white/70 font-bold mb-2 ml-1">Password</Text>
                         <View className="bg-white/8 border border-white/10 rounded-2xl px-4 h-14 justify-center">
-                            <Input
-                                style={{ borderWidth: 0, height: '100%', paddingHorizontal: 0, backgroundColor: 'transparent', color: '#fff' }}
+                            <TextInput
+                                style={{ height: '100%', backgroundColor: 'transparent', color: '#fff', fontSize: 16 }}
                                 placeholder="••••••••"
                                 placeholderTextColor="rgba(255,255,255,0.3)"
                                 value={password}

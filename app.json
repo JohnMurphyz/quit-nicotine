@@ -16,6 +16,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.quitnicotine.app",
+      "usesAppleSignIn": true,
       "infoPlist": {
         "UIBackgroundModes": [
           "remote-notification"
@@ -52,7 +53,14 @@
       ],
       "expo-localization",
       "expo-font",
-      "react-native-audio-api"
+      "react-native-audio-api",
+      "expo-apple-authentication",
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.563305033257-tgqutnu2ot8td8vkr0qrgg7mgk8vipt3"
+        }
+      ]
     ],
     "extra": {
       "eas": {

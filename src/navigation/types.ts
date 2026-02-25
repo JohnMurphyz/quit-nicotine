@@ -18,17 +18,16 @@ export type OnboardingStackParamList = {
   QuizFrequencyCost: undefined;
   QuizWhy: undefined;
   QuizTriggers: undefined;
-  QuizPastAttempts: undefined;
+  QuizReadiness: undefined;
 
-  // Phase 3: Value & Paywall
-  AnalysisLoading: undefined;
-  ValueReveal: undefined;
-  Paywall: undefined;
-
-  // Phase 4: Commitment
+  // Phase 3: Results & Account
+  PersonalizedResults: undefined;
   AuthCreation: undefined;
+
+  // Phase 4: Commitment & Paywall
   SetQuitDate: undefined;
   FinalPledge: undefined;
+  Paywall: undefined;
 };
 
 export type TabParamList = {

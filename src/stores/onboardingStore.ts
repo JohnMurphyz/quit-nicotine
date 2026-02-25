@@ -8,6 +8,8 @@ interface OnboardingData {
   nicotineType: NicotineType | null;
   usageDetails: UsageDetails | null;
   dailyCost: number | null;
+  costPerUnit: number | null;
+  unitsPerWeek: number | null;
   quitDate: string | null; // ISO date string
   readinessLevel: number | null;
   hasProducts: boolean | null;
@@ -18,9 +20,9 @@ interface OnboardingData {
   supportPerson: string | null;
   wantsLecture: boolean | null;
 
-  // New Quiz Fields
+  // Quiz Fields
   triggers: string[];
-  pastAttempts: string | null;
+  currency: string;
 }
 
 interface OnboardingState extends OnboardingData {
@@ -28,6 +30,7 @@ interface OnboardingState extends OnboardingData {
   currentStep: number;
   setNicotineType: (type: NicotineType) => void;
   setUsageDetails: (details: UsageDetails) => void;
+  setCostAndFrequency: (costPerUnit: number, unitsPerWeek: number) => void;
   setCostAndQuitDate: (dailyCost: number, quitDate: string) => void;
   setReadinessLevel: (level: number) => void;
   setHasProducts: (has: boolean) => void;
@@ -47,15 +50,18 @@ interface OnboardingState extends OnboardingData {
   loadPersisted: () => Promise<void>;
   reset: () => void;
 
-  // New Quiz Setters
+  setCurrency: (currency: string) => void;
+
+  // Quiz Setters
   setTriggers: (triggers: string[]) => void;
-  setPastAttempts: (attempts: string) => void;
 }
 
 const initialData: OnboardingData = {
   nicotineType: null,
   usageDetails: null,
   dailyCost: null,
+  costPerUnit: null,
+  unitsPerWeek: null,
   quitDate: null,
   readinessLevel: null,
   hasProducts: null,
@@ -66,7 +72,7 @@ const initialData: OnboardingData = {
   supportPerson: null,
   wantsLecture: null,
   triggers: [],
-  pastAttempts: null,
+  currency: 'USD',
 };
 
 export const useOnboardingStore = create<OnboardingState>((set, get) => ({
@@ -81,6 +87,12 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
 
   setUsageDetails: (details) => {
     set({ usageDetails: details });
+    get().persist();
+  },
+
+  setCostAndFrequency: (costPerUnit, unitsPerWeek) => {
+    const dailyCost = (costPerUnit * unitsPerWeek) / 7;
+    set({ costPerUnit, unitsPerWeek, dailyCost });
     get().persist();
   },
 
@@ -142,6 +154,8 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
       nicotineType: s.nicotineType,
       usageDetails: s.usageDetails,
       dailyCost: s.dailyCost,
+      costPerUnit: s.costPerUnit,
+      unitsPerWeek: s.unitsPerWeek,
       quitDate: s.quitDate,
       readinessLevel: s.readinessLevel,
       hasProducts: s.hasProducts,
@@ -152,16 +166,17 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
       supportPerson: s.supportPerson,
       wantsLecture: s.wantsLecture,
       triggers: s.triggers,
-      pastAttempts: s.pastAttempts,
+      currency: s.currency,
     };
+  },
+
+  setCurrency: (currency) => {
+    set({ currency });
+    get().persist();
   },
 
   setTriggers: (triggers) => {
     set({ triggers });
-    get().persist();
-  },
-  setPastAttempts: (attempts) => {
-    set({ pastAttempts: attempts });
     get().persist();
   },
 

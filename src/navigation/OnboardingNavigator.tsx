@@ -12,18 +12,17 @@ import WelcomeScreen from '@/src/screens/onboarding/phase1/WelcomeScreen';
 // Phase 2
 import QuizFrequencyCostScreen from '@/src/screens/onboarding/phase2/QuizFrequencyCostScreen';
 import QuizNicotineTypeScreen from '@/src/screens/onboarding/phase2/QuizNicotineTypeScreen';
-import QuizPastAttemptsScreen from '@/src/screens/onboarding/phase2/QuizPastAttemptsScreen';
+import QuizReadinessScreen from '@/src/screens/onboarding/phase2/QuizReadinessScreen';
 import QuizTriggersScreen from '@/src/screens/onboarding/phase2/QuizTriggersScreen';
 import QuizWhyScreen from '@/src/screens/onboarding/phase2/QuizWhyScreen';
 
 // Phase 3
-import AnalysisLoadingScreen from '@/src/screens/onboarding/phase3/AnalysisLoadingScreen';
-import PaywallScreen from '@/src/screens/onboarding/phase3/PaywallScreen';
-import ValueRevealScreen from '@/src/screens/onboarding/phase3/ValueRevealScreen';
+import PersonalizedResultsScreen from '@/src/screens/onboarding/phase3/PersonalizedResultsScreen';
 
 // Phase 4
 import AuthCreationScreen from '@/src/screens/onboarding/phase4/AuthCreationScreen';
 import FinalPledgeScreen from '@/src/screens/onboarding/phase4/FinalPledgeScreen';
+import PaywallScreen from '@/src/screens/onboarding/phase3/PaywallScreen';
 import SetQuitDateScreen from '@/src/screens/onboarding/phase4/SetQuitDateScreen';
 
 const Stack = createNativeStackNavigator<OnboardingStackParamList>();
@@ -40,7 +39,7 @@ export function OnboardingNavigator() {
       initialRouteName="Welcome"
       screenOptions={{
         headerShown: false,
-        animation: 'fade', // Better for high-end feel than slide
+        animation: 'fade',
       }}
     >
       {/* Phase 1: Walkthrough Setup */}
@@ -50,41 +49,20 @@ export function OnboardingNavigator() {
       <Stack.Screen name="WalkthroughFeatures" component={WalkthroughFeaturesScreen} options={{ animation: 'slide_from_right' }} />
 
       {/* Phase 2: Quiz */}
-      <Stack.Screen
-        name="QuizNicotineType"
-        component={QuizNicotineTypeScreen}
-        options={{ animation: 'slide_from_right' }} // Slide for quiz flow
-      />
-      <Stack.Screen
-        name="QuizFrequencyCost"
-        component={QuizFrequencyCostScreen}
-        options={{ animation: 'slide_from_right' }}
-      />
-      <Stack.Screen
-        name="QuizWhy"
-        component={QuizWhyScreen}
-        options={{ animation: 'slide_from_right' }}
-      />
-      <Stack.Screen
-        name="QuizTriggers"
-        component={QuizTriggersScreen}
-        options={{ animation: 'slide_from_right' }}
-      />
-      <Stack.Screen
-        name="QuizPastAttempts"
-        component={QuizPastAttemptsScreen}
-        options={{ animation: 'slide_from_right' }}
-      />
+      <Stack.Screen name="QuizNicotineType" component={QuizNicotineTypeScreen} options={{ animation: 'slide_from_right' }} />
+      <Stack.Screen name="QuizFrequencyCost" component={QuizFrequencyCostScreen} options={{ animation: 'slide_from_right' }} />
+      <Stack.Screen name="QuizWhy" component={QuizWhyScreen} options={{ animation: 'slide_from_right' }} />
+      <Stack.Screen name="QuizTriggers" component={QuizTriggersScreen} options={{ animation: 'slide_from_right' }} />
+      <Stack.Screen name="QuizReadiness" component={QuizReadinessScreen} options={{ animation: 'slide_from_right' }} />
 
-      {/* Phase 3: Value & Paywall */}
-      <Stack.Screen name="AnalysisLoading" component={AnalysisLoadingScreen} options={{ animation: 'fade' }} />
-      <Stack.Screen name="ValueReveal" component={ValueRevealScreen} />
-      <Stack.Screen name="Paywall" component={PaywallScreen} />
-
-      {/* Phase 4: Commitment */}
+      {/* Phase 3: Results & Account */}
+      <Stack.Screen name="PersonalizedResults" component={PersonalizedResultsScreen} />
       <Stack.Screen name="AuthCreation" component={AuthCreationScreen} />
+
+      {/* Phase 4: Commitment & Paywall */}
       <Stack.Screen name="SetQuitDate" component={SetQuitDateScreen} />
       <Stack.Screen name="FinalPledge" component={FinalPledgeScreen} />
+      <Stack.Screen name="Paywall" component={PaywallScreen} />
     </Stack.Navigator>
   );
 }
