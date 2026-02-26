@@ -1,19 +1,22 @@
 import { useAuthStore } from '@/src/stores/authStore';
 import { useOnboardingStore } from '@/src/stores/onboardingStore';
+import { useSubscriptionStore } from '@/src/stores/subscriptionStore';
+import { getOfferings, syncSubscriptionToSupabase } from '@/src/lib/revenueCat';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useState } from 'react';
-import { Image, Pressable, ScrollView, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Alert, Image, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import type { PurchasesPackage } from 'react-native-purchases';
 
 type Plan = 'monthly' | 'annual' | 'lifetime';
 
-const PLANS: { id: Plan; title: string; line1: string; line2: string; badge?: string; icon: keyof typeof Ionicons.glyphMap; iconColor: string }[] = [
-    { id: 'monthly', title: 'Monthly', line1: '$3.99/month', line2: 'cancel anytime', icon: 'calendar-outline', iconColor: '#60a5fa' },
-    { id: 'annual', title: 'Annually', line1: '3 days free', line2: 'then $19.99/year,\ncancel anytime', badge: '-50%', icon: 'star-outline', iconColor: '#fbbf24' },
-    { id: 'lifetime', title: 'Lifetime', line1: '$39.99', line2: 'one time payment', icon: 'diamond-outline', iconColor: '#c084fc' },
-];
+const PLAN_CONFIG: Record<Plan, { title: string; badge?: string; icon: keyof typeof Ionicons.glyphMap; iconColor: string; rcIdentifier: string }> = {
+    monthly: { title: 'Monthly', icon: 'calendar-outline', iconColor: '#60a5fa', rcIdentifier: 'monthly' },
+    annual: { title: 'Annually', badge: '-50%', icon: 'star-outline', iconColor: '#fbbf24', rcIdentifier: 'yearly' },
+    lifetime: { title: 'Lifetime', icon: 'diamond-outline', iconColor: '#c084fc', rcIdentifier: 'lifetime' },
+};
 
 const SUBTITLES: Record<Plan, string> = {
     annual: 'Get through the worst with us. Stay if you like.',
@@ -21,17 +24,53 @@ const SUBTITLES: Record<Plan, string> = {
     lifetime: 'One purchase. Yours forever.',
 };
 
+const FALLBACK_PLANS: { id: Plan; line1: string; line2: string }[] = [
+    { id: 'monthly', line1: '$3.99/month', line2: 'cancel anytime' },
+    { id: 'annual', line1: '3 days free', line2: 'then $19.99/year,\ncancel anytime' },
+    { id: 'lifetime', line1: '$39.99', line2: 'one time payment' },
+];
+
 export default function PaywallScreen() {
     const { nicotineType, motivations, specificBenefit, readinessLevel } = useOnboardingStore();
     const { user, updateProfile } = useAuthStore();
+    const { purchaseMobile } = useSubscriptionStore();
     const [selectedPlan, setSelectedPlan] = useState<Plan>('annual');
     const [submitting, setSubmitting] = useState(false);
+    const [packages, setPackages] = useState<PurchasesPackage[]>([]);
+
+    useEffect(() => {
+        if (Platform.OS !== 'web') {
+            getOfferings().then(setPackages).catch(console.error);
+        }
+    }, []);
+
+    const getPackageForPlan = (planId: Plan): PurchasesPackage | undefined => {
+        const config = PLAN_CONFIG[planId];
+        return packages.find((p) => p.identifier === config.rcIdentifier);
+    };
+
+    const getPlanDisplay = (planId: Plan): { line1: string; line2: string } => {
+        const pkg = getPackageForPlan(planId);
+        if (!pkg) {
+            const fallback = FALLBACK_PLANS.find((f) => f.id === planId)!;
+            return { line1: fallback.line1, line2: fallback.line2 };
+        }
+
+        const price = pkg.product.priceString;
+        switch (planId) {
+            case 'monthly':
+                return { line1: `${price}/month`, line2: 'cancel anytime' };
+            case 'annual':
+                return { line1: '3 days free', line2: `then ${price}/year,\ncancel anytime` };
+            case 'lifetime':
+                return { line1: price, line2: 'one time payment' };
+        }
+    };
 
     const completeOnboarding = async () => {
         if (submitting) return;
         setSubmitting(true);
         try {
-            // Ensure we have a user — fall back to anonymous sign-in if needed
             let currentUser = useAuthStore.getState().user;
             if (!currentUser) {
                 await useAuthStore.getState().signInAnonymously();
@@ -52,6 +91,44 @@ export default function PaywallScreen() {
             setSubmitting(false);
         }
     };
+
+    const handlePurchase = async () => {
+        if (submitting) return;
+
+        const pkg = getPackageForPlan(selectedPlan);
+        if (!pkg) {
+            // No packages loaded — just complete onboarding
+            await completeOnboarding();
+            return;
+        }
+
+        setSubmitting(true);
+        try {
+            let currentUser = useAuthStore.getState().user;
+            if (!currentUser) {
+                await useAuthStore.getState().signInAnonymously();
+                currentUser = useAuthStore.getState().user;
+            }
+            if (!currentUser) throw new Error('Unable to create session');
+
+            await purchaseMobile(pkg.identifier, currentUser.id);
+            await syncSubscriptionToSupabase(currentUser.id);
+            await completeOnboarding();
+        } catch (error: any) {
+            if (error?.userCancelled) {
+                // User cancelled — do nothing
+            } else {
+                Alert.alert('Purchase Failed', error?.message ?? 'Something went wrong. Please try again.');
+            }
+            setSubmitting(false);
+        }
+    };
+
+    const plans = (['monthly', 'annual', 'lifetime'] as Plan[]).map((id) => ({
+        id,
+        ...PLAN_CONFIG[id],
+        ...getPlanDisplay(id),
+    }));
 
     return (
         <View className="flex-1 bg-dark-900">
@@ -84,7 +161,7 @@ export default function PaywallScreen() {
 
                 {/* Plan cards — three across */}
                 <Animated.View entering={FadeInUp.duration(600).delay(200)} className="flex-row justify-between px-6 mb-8">
-                    {PLANS.map((plan) => {
+                    {plans.map((plan) => {
                         const isSelected = selectedPlan === plan.id;
                         return (
                             <Pressable
@@ -171,7 +248,7 @@ export default function PaywallScreen() {
             <SafeAreaView edges={['bottom']} className="px-6 pb-4">
                 <Animated.View entering={FadeInUp.duration(600).delay(400)}>
                     <Pressable
-                        onPress={completeOnboarding}
+                        onPress={handlePurchase}
                         disabled={submitting}
                         className={`w-full h-14 rounded-2xl items-center justify-center shadow-lg ${submitting ? 'bg-white/20' : 'bg-white active:opacity-80'}`}
                     >

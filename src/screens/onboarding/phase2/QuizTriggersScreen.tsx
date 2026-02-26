@@ -1,3 +1,4 @@
+import { AnimatedSkyBackground } from '@/src/components/AnimatedSkyBackground';
 import type { OnboardingStackParamList } from '@/src/navigation/types';
 import { useOnboardingStore } from '@/src/stores/onboardingStore';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -100,42 +101,44 @@ export default function QuizTriggersScreen() {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-dark-900 px-6 pt-4">
-            <QuizProgressHeader currentStep={4} totalSteps={5} />
+        <AnimatedSkyBackground>
+            <SafeAreaView className="flex-1 px-6 pt-4">
+                <QuizProgressHeader currentStep={4} totalSteps={5} />
 
-            <Animated.View entering={FadeInUp.duration(600)}>
-                <Text
-                    style={{ fontFamily: 'AbrilFatface_400Regular', fontSize: 28 }}
-                    className="text-white mb-2"
-                >
-                    When do cravings hit?
-                </Text>
-                <Text className="text-base text-white/50 mb-8">
-                    Select all that apply so we can customize your SOS tools.
-                </Text>
-            </Animated.View>
+                <Animated.View entering={FadeInUp.duration(600)}>
+                    <Text
+                        style={{ fontFamily: 'AbrilFatface_400Regular', fontSize: 28 }}
+                        className="text-white mb-2"
+                    >
+                        When do cravings hit?
+                    </Text>
+                    <Text className="text-base text-white/50 mb-8">
+                        Select all that apply so we can customize your SOS tools.
+                    </Text>
+                </Animated.View>
 
-            <View className="flex-1 flex-row flex-wrap justify-between">
-                {OPTIONS.map((opt, index) => (
-                    <TriggerCard
-                        key={opt.id}
-                        opt={opt}
-                        index={index}
-                        isSelected={selected.has(opt.id)}
-                        onToggle={toggleTrigger}
-                    />
-                ))}
-            </View>
+                <View className="flex-1 flex-row flex-wrap justify-between">
+                    {OPTIONS.map((opt, index) => (
+                        <TriggerCard
+                            key={opt.id}
+                            opt={opt}
+                            index={index}
+                            isSelected={selected.has(opt.id)}
+                            onToggle={toggleTrigger}
+                        />
+                    ))}
+                </View>
 
-            <Animated.View entering={FadeInUp.duration(600).delay(400)} className="w-full pb-8">
-                <Pressable
-                    onPress={handleNext}
-                    disabled={selected.size === 0}
-                    className={`w-full h-14 rounded-2xl items-center justify-center ${selected.size > 0 ? 'bg-white active:opacity-80' : 'bg-white/20'}`}
-                >
-                    <Text className={`text-lg font-bold ${selected.size > 0 ? 'text-black' : 'text-white/40'}`}>Next</Text>
-                </Pressable>
-            </Animated.View>
-        </SafeAreaView>
+                <Animated.View entering={FadeInUp.duration(600).delay(400)} className="w-full pb-8">
+                    <Pressable
+                        onPress={handleNext}
+                        disabled={selected.size === 0}
+                        className={`w-full h-14 rounded-2xl items-center justify-center ${selected.size > 0 ? 'bg-white active:opacity-80' : 'bg-white/20'}`}
+                    >
+                        <Text className={`text-lg font-bold ${selected.size > 0 ? 'text-black' : 'text-white/40'}`}>Next</Text>
+                    </Pressable>
+                </Animated.View>
+            </SafeAreaView>
+        </AnimatedSkyBackground>
     );
 }

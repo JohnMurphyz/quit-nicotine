@@ -1,3 +1,4 @@
+import { AnimatedSkyBackground } from '@/src/components/AnimatedSkyBackground';
 import type { OnboardingStackParamList } from '@/src/navigation/types';
 import { useOnboardingStore } from '@/src/stores/onboardingStore';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -92,40 +93,42 @@ export default function QuizReadinessScreen() {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-dark-900 px-6 pt-4">
-            <QuizProgressHeader currentStep={5} totalSteps={5} />
+        <AnimatedSkyBackground>
+            <SafeAreaView className="flex-1 px-6 pt-4">
+                <QuizProgressHeader currentStep={5} totalSteps={5} />
 
-            <Animated.View entering={FadeInUp.duration(500)}>
-                <Image
-                    source={require('@/assets/images/quiz-readiness-hero.png')}
-                    style={{ width: '100%', height: 140, borderRadius: 16, opacity: 0.85 }}
-                    resizeMode="cover"
-                />
-            </Animated.View>
-
-            <Animated.View entering={FadeInUp.duration(600)} style={{ marginTop: 16 }}>
-                <Text
-                    style={{ fontFamily: 'AbrilFatface_400Regular', fontSize: 28 }}
-                    className="text-white mb-2"
-                >
-                    How ready do you feel?
-                </Text>
-                <Text className="text-base text-white/50 mb-8">
-                    No wrong answer. We'll meet you where you are.
-                </Text>
-            </Animated.View>
-
-            <View className="flex-1">
-                {OPTIONS.map((opt, index) => (
-                    <OptionCard
-                        key={opt.id}
-                        opt={opt}
-                        index={index}
-                        isSelected={readinessLevel === opt.id}
-                        onSelect={handleSelect}
+                <Animated.View entering={FadeInUp.duration(500)}>
+                    <Image
+                        source={require('@/assets/images/quiz-readiness-hero.png')}
+                        style={{ width: '100%', height: 140, borderRadius: 16, opacity: 0.85 }}
+                        resizeMode="cover"
                     />
-                ))}
-            </View>
-        </SafeAreaView>
+                </Animated.View>
+
+                <Animated.View entering={FadeInUp.duration(600)} style={{ marginTop: 16 }}>
+                    <Text
+                        style={{ fontFamily: 'AbrilFatface_400Regular', fontSize: 28 }}
+                        className="text-white mb-2"
+                    >
+                        How ready do you feel?
+                    </Text>
+                    <Text className="text-base text-white/50 mb-8">
+                        No wrong answer. We'll meet you where you are.
+                    </Text>
+                </Animated.View>
+
+                <View className="flex-1">
+                    {OPTIONS.map((opt, index) => (
+                        <OptionCard
+                            key={opt.id}
+                            opt={opt}
+                            index={index}
+                            isSelected={readinessLevel === opt.id}
+                            onSelect={handleSelect}
+                        />
+                    ))}
+                </View>
+            </SafeAreaView>
+        </AnimatedSkyBackground>
     );
 }

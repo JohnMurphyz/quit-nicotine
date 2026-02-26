@@ -1,3 +1,4 @@
+import { AnimatedSkyBackground } from '@/src/components/AnimatedSkyBackground';
 import type { OnboardingStackParamList } from '@/src/navigation/types';
 import { useOnboardingStore } from '@/src/stores/onboardingStore';
 import type { NicotineType } from '@/src/types';
@@ -13,9 +14,7 @@ import Animated, {
     FadeInUp,
     useAnimatedStyle,
     useSharedValue,
-    withSequence,
-    withSpring,
-    withTiming,
+    withSpring
 } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { QuizProgressHeader } from './QuizProgressHeader';
@@ -91,32 +90,34 @@ export default function QuizNicotineTypeScreen() {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-dark-900 px-6 pt-4">
-            <QuizProgressHeader currentStep={1} totalSteps={5} />
+        <AnimatedSkyBackground>
+            <SafeAreaView className="flex-1 px-6 pt-4">
+                <QuizProgressHeader currentStep={1} totalSteps={5} />
 
-            <Animated.View entering={FadeInUp.duration(600)}>
-                <Text
-                    style={{ fontFamily: 'AbrilFatface_400Regular', fontSize: 28 }}
-                    className="text-white mb-2"
-                >
-                    What are you quitting?
-                </Text>
-                <Text className="text-base text-white/50 mb-8">
-                    This helps us personalize your recovery milestones.
-                </Text>
-            </Animated.View>
+                <Animated.View entering={FadeInUp.duration(600)}>
+                    <Text
+                        style={{ fontFamily: 'AbrilFatface_400Regular', fontSize: 28 }}
+                        className="text-white mb-2"
+                    >
+                        What are you quitting?
+                    </Text>
+                    <Text className="text-base text-white/50 mb-8">
+                        This helps us personalize your recovery milestones.
+                    </Text>
+                </Animated.View>
 
-            <View className="flex-1">
-                {OPTIONS.map((opt, index) => (
-                    <OptionCard
-                        key={opt.id}
-                        opt={opt}
-                        index={index}
-                        isSelected={nicotineType === opt.id}
-                        onSelect={handleSelect}
-                    />
-                ))}
-            </View>
-        </SafeAreaView>
+                <View className="flex-1">
+                    {OPTIONS.map((opt, index) => (
+                        <OptionCard
+                            key={opt.id}
+                            opt={opt}
+                            index={index}
+                            isSelected={nicotineType === opt.id}
+                            onSelect={handleSelect}
+                        />
+                    ))}
+                </View>
+            </SafeAreaView>
+        </AnimatedSkyBackground>
     );
 }

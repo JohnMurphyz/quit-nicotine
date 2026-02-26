@@ -1,3 +1,4 @@
+import { AnimatedSkyBackground } from '@/src/components/AnimatedSkyBackground';
 import type { OnboardingStackParamList } from '@/src/navigation/types';
 import { useOnboardingStore } from '@/src/stores/onboardingStore';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -101,42 +102,44 @@ export default function QuizWhyScreen() {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-dark-900 px-6 pt-4">
-            <QuizProgressHeader currentStep={3} totalSteps={5} />
+        <AnimatedSkyBackground>
+            <SafeAreaView className="flex-1 px-6 pt-4">
+                <QuizProgressHeader currentStep={3} totalSteps={5} />
 
-            <Animated.View entering={FadeInUp.duration(600)}>
-                <Text
-                    style={{ fontFamily: 'AbrilFatface_400Regular', fontSize: 28 }}
-                    className="text-white mb-2"
-                >
-                    What drives you?
-                </Text>
-                <Text className="text-base text-white/50 mb-8">
-                    Select everything that resonates. Your top pick powers your pledge.
-                </Text>
-            </Animated.View>
+                <Animated.View entering={FadeInUp.duration(600)}>
+                    <Text
+                        style={{ fontFamily: 'AbrilFatface_400Regular', fontSize: 28 }}
+                        className="text-white mb-2"
+                    >
+                        What drives you?
+                    </Text>
+                    <Text className="text-base text-white/50 mb-8">
+                        Select everything that resonates. Your top pick powers your pledge.
+                    </Text>
+                </Animated.View>
 
-            <View className="flex-1">
-                {OPTIONS.map((opt, index) => (
-                    <OptionCard
-                        key={opt.id}
-                        opt={opt}
-                        index={index}
-                        isSelected={selected.has(opt.id)}
-                        onToggle={toggleOption}
-                    />
-                ))}
-            </View>
+                <View className="flex-1">
+                    {OPTIONS.map((opt, index) => (
+                        <OptionCard
+                            key={opt.id}
+                            opt={opt}
+                            index={index}
+                            isSelected={selected.has(opt.id)}
+                            onToggle={toggleOption}
+                        />
+                    ))}
+                </View>
 
-            <Animated.View entering={FadeInUp.duration(600).delay(400)} className="w-full pb-8">
-                <Pressable
-                    onPress={handleNext}
-                    disabled={selected.size === 0}
-                    className={`w-full h-14 rounded-2xl items-center justify-center ${selected.size > 0 ? 'bg-white active:opacity-80' : 'bg-white/20'}`}
-                >
-                    <Text className={`text-lg font-bold ${selected.size > 0 ? 'text-black' : 'text-white/40'}`}>Next</Text>
-                </Pressable>
-            </Animated.View>
-        </SafeAreaView>
+                <Animated.View entering={FadeInUp.duration(600).delay(400)} className="w-full pb-8">
+                    <Pressable
+                        onPress={handleNext}
+                        disabled={selected.size === 0}
+                        className={`w-full h-14 rounded-2xl items-center justify-center ${selected.size > 0 ? 'bg-white active:opacity-80' : 'bg-white/20'}`}
+                    >
+                        <Text className={`text-lg font-bold ${selected.size > 0 ? 'text-black' : 'text-white/40'}`}>Next</Text>
+                    </Pressable>
+                </Animated.View>
+            </SafeAreaView>
+        </AnimatedSkyBackground>
     );
 }

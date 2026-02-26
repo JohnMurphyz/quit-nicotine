@@ -1,8 +1,9 @@
-import { View, Text, ScrollView, Pressable, Alert } from 'react-native';
+import { View, Text, ScrollView, Pressable, Alert, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useAuthStore } from '@/src/stores/authStore';
+import { useSubscriptionStore } from '@/src/stores/subscriptionStore';
 import { AnimatedSkyBackground } from '@/src/components/AnimatedSkyBackground';
 import { useSkyThemeStore } from '@/src/stores/skyThemeStore';
 import { useThemeColors } from '@/src/hooks/useThemeColors';
@@ -19,6 +20,7 @@ const NICOTINE_OPTIONS: { label: string; value: NicotineType }[] = [
 
 export default function SettingsScreen() {
   const { profile, signOut, updateProfile } = useAuthStore();
+  const { isActive, presentPaywall, presentCustomerCenter } = useSubscriptionStore();
   const { theme: skyTheme, setTheme: setSkyTheme } = useSkyThemeStore();
   const { resetCheckIn } = useCheckInInterval();
   const colors = useThemeColors();
@@ -196,6 +198,50 @@ export default function SettingsScreen() {
               </Container>
             );
           })}
+
+          {/* Subscription */}
+          {Platform.OS !== 'web' && (
+            <View className="mt-6">
+              <Text className="text-xs font-medium mb-3" style={{ color: '#7c3aed' }}>
+                Subscription
+              </Text>
+              <View style={{ gap: 10 }}>
+                {!isActive && (
+                  <Pressable
+                    onPress={() => presentPaywall()}
+                    style={{
+                      borderWidth: 1,
+                      borderColor: '#10b981',
+                      backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                      borderRadius: 12,
+                      padding: 14,
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Text style={{ fontSize: 15, fontWeight: '700', color: '#10b981' }}>
+                      Upgrade to Freed Pro
+                    </Text>
+                  </Pressable>
+                )}
+                {isActive && (
+                  <Pressable
+                    onPress={() => presentCustomerCenter()}
+                    style={{
+                      borderWidth: 1,
+                      borderColor: colors.borderColor,
+                      borderRadius: 12,
+                      padding: 14,
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Text style={{ fontSize: 15, fontWeight: '600', color: colors.textSecondary }}>
+                      Manage Subscription
+                    </Text>
+                  </Pressable>
+                )}
+              </View>
+            </View>
+          )}
 
           {/* Sky Theme */}
           <View className="mt-6 mb-2">

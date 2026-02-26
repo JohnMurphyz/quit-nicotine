@@ -1,5 +1,16 @@
+import { Platform } from 'react-native';
 import { create } from 'zustand';
 import { supabase } from '@/src/lib/supabase';
+import {
+  purchasePackage as rcPurchase,
+  restorePurchases as rcRestore,
+  checkSubscriptionStatus,
+  syncSubscriptionToSupabase,
+  setCustomerInfoListener,
+  presentPaywall as rcPresentPaywall,
+  presentPaywallIfNeeded as rcPresentPaywallIfNeeded,
+  presentCustomerCenter as rcPresentCustomerCenter,
+} from '@/src/lib/revenueCat';
 import type { SubscriptionStatus } from '@/src/types';
 
 interface SubscriptionState {
@@ -9,9 +20,13 @@ interface SubscriptionState {
 
   fetchStatus: (userId: string) => Promise<void>;
   setStatus: (status: SubscriptionStatus) => void;
-  restorePurchases: () => Promise<void>;
-  purchaseMobile: (packageId: string) => Promise<void>;
+  restorePurchases: (userId: string) => Promise<void>;
+  purchaseMobile: (packageId: string, userId: string) => Promise<void>;
   purchaseWeb: (userId: string, priceId: string) => Promise<void>;
+  presentPaywall: () => Promise<boolean>;
+  presentPaywallIfNeeded: () => Promise<boolean>;
+  presentCustomerCenter: () => Promise<void>;
+  initListener: () => void;
 }
 
 export const useSubscriptionStore = create<SubscriptionState>((set) => ({
@@ -22,6 +37,19 @@ export const useSubscriptionStore = create<SubscriptionState>((set) => ({
   fetchStatus: async (userId) => {
     set({ loading: true });
     try {
+      // On native, check RevenueCat first for the freshest status
+      if (Platform.OS !== 'web') {
+        try {
+          const isActive = await checkSubscriptionStatus();
+          if (isActive) {
+            set({ status: 'active', isActive: true });
+            return;
+          }
+        } catch {
+          // Fall through to Supabase check
+        }
+      }
+
       const { data, error } = await supabase
         .from('profiles')
         .select('subscription_status')
@@ -44,16 +72,59 @@ export const useSubscriptionStore = create<SubscriptionState>((set) => ({
     set({ status, isActive: status === 'active' || status === 'trial' });
   },
 
-  // TODO: Re-enable when RevenueCat is configured
-  restorePurchases: async () => {
-    console.warn('Purchases not configured yet');
+  restorePurchases: async (userId) => {
+    set({ loading: true });
+    try {
+      const isActive = await rcRestore();
+      set({
+        status: isActive ? 'active' : 'none',
+        isActive,
+      });
+      await syncSubscriptionToSupabase(userId);
+    } finally {
+      set({ loading: false });
+    }
   },
 
-  purchaseMobile: async () => {
-    console.warn('Purchases not configured yet');
+  purchaseMobile: async (packageId, userId) => {
+    set({ loading: true });
+    try {
+      const isActive = await rcPurchase(packageId);
+      set({
+        status: isActive ? 'active' : 'none',
+        isActive,
+      });
+      await syncSubscriptionToSupabase(userId);
+    } finally {
+      set({ loading: false });
+    }
   },
 
   purchaseWeb: async () => {
-    console.warn('Purchases not configured yet');
+    console.warn('Web purchases not configured yet');
+  },
+
+  // Present the RevenueCat UI paywall (designed in RC dashboard)
+  presentPaywall: async () => {
+    return rcPresentPaywall();
+  },
+
+  // Only presents paywall if user doesn't have the entitlement
+  presentPaywallIfNeeded: async () => {
+    return rcPresentPaywallIfNeeded();
+  },
+
+  // Present RevenueCat Customer Center for subscription management
+  presentCustomerCenter: async () => {
+    await rcPresentCustomerCenter();
+  },
+
+  initListener: () => {
+    setCustomerInfoListener((isActive) => {
+      set({
+        status: isActive ? 'active' : 'expired',
+        isActive,
+      });
+    });
   },
 }));

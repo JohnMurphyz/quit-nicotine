@@ -1,27 +1,41 @@
-import { View, Text } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useEffect } from 'react';
+import { Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Button } from '@/src/components/ui/Button';
+import { useSubscriptionStore } from '@/src/stores/subscriptionStore';
+import { useAuthStore } from '@/src/stores/authStore';
+import { syncSubscriptionToSupabase } from '@/src/lib/revenueCat';
 
-// TODO: Re-enable when RevenueCat/Stripe is configured
 export default function PaywallScreen() {
   const navigation = useNavigation();
+  const { presentPaywall, fetchStatus } = useSubscriptionStore();
+  const user = useAuthStore((s) => s.user);
 
-  return (
-    <SafeAreaView className="flex-1 bg-warm-50">
-      <View className="flex-1 items-center justify-center px-6">
-        <Text className="text-3xl font-bold text-warm-800 text-center mb-2">
-          Subscriptions Coming Soon
-        </Text>
-        <Text className="text-base text-warm-400 text-center mb-8">
-          Premium features will be available here. For now, enjoy full access.
-        </Text>
-        <Button
-          title="Go Back"
-          size="lg"
-          onPress={() => navigation.goBack()}
-        />
-      </View>
-    </SafeAreaView>
-  );
+  useEffect(() => {
+    if (Platform.OS === 'web') {
+      navigation.goBack();
+      return;
+    }
+
+    let mounted = true;
+
+    (async () => {
+      const purchased = await presentPaywall();
+
+      if (!mounted) return;
+
+      if (purchased && user?.id) {
+        await syncSubscriptionToSupabase(user.id);
+        await fetchStatus(user.id);
+      }
+
+      navigation.goBack();
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // RevenueCatUI presents its own full-screen modal — nothing to render here
+  return null;
 }

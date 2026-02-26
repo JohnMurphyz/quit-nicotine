@@ -21,4 +21,4 @@ export const isAndroid = Platform.OS === 'android';
 
 export const RC_API_KEY = isIOS ? RC_IOS_KEY : RC_ANDROID_KEY;
 
-export const ENTITLEMENT_ID = 'premium';
+export const ENTITLEMENT_ID = 'Freed Pro';
