@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useAuthStore } from '@/src/stores/authStore';
 import { useSubscriptionStore } from '@/src/stores/subscriptionStore';
 import { supabase } from '@/src/lib/supabase';
-import { initRevenueCat } from '@/src/lib/revenueCat';
+import { loginUser } from '@/src/lib/revenueCat';
 
 export function useAuth() {
   const store = useAuthStore();
@@ -18,8 +18,8 @@ export function useAuth() {
         if (session?.user) {
           await store.fetchProfile();
 
-          // Initialize RevenueCat with the user's ID
-          await initRevenueCat(session.user.id);
+          // Associate this authenticated user with their RC account
+          await loginUser(session.user.id);
 
           // Set up the customer info listener to keep store in sync
           useSubscriptionStore.getState().initListener();

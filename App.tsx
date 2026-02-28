@@ -2,6 +2,7 @@ import { useAuth } from '@/src/hooks/useAuth';
 import { RootNavigator } from '@/src/navigation/RootNavigator';
 import { linking } from '@/src/navigation/linking';
 import { useSkyThemeStore } from '@/src/stores/skyThemeStore';
+import { initRevenueCat } from '@/src/lib/revenueCat';
 import {
   AbrilFatface_400Regular,
 } from '@expo-google-fonts/abril-fatface';
@@ -34,6 +35,8 @@ export default function App() {
 
   useEffect(() => {
     useSkyThemeStore.getState().load();
+    // Init RC anonymously so offerings are available before the user logs in
+    initRevenueCat();
   }, []);
 
   useEffect(() => {

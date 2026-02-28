@@ -1,6 +1,7 @@
 import Purchases, {
   type PurchasesPackage,
   type CustomerInfo,
+  type Offering,
   LOG_LEVEL,
 } from 'react-native-purchases';
 import RevenueCatUI, { PAYWALL_RESULT } from 'react-native-purchases-ui';
@@ -21,7 +22,9 @@ export function isInitialized() {
   return initialized;
 }
 
-export async function initRevenueCat(userId: string) {
+// Call once at app startup (no userId = anonymous RC user).
+// Offerings are available immediately after this, before any login.
+export async function initRevenueCat(userId?: string) {
   if (Platform.OS === 'web' || initialized) return;
 
   if (!RC_API_KEY) {
@@ -38,6 +41,7 @@ export async function initRevenueCat(userId: string) {
 
     Purchases.configure({ apiKey: RC_API_KEY, appUserID: userId });
     initialized = true;
+    console.log('[RevenueCat] Initialized OK. userId:', userId ?? 'anonymous');
 
     Purchases.addCustomerInfoUpdateListener((customerInfo: CustomerInfo) => {
       const isActive = checkEntitlement(customerInfo);
@@ -48,10 +52,38 @@ export async function initRevenueCat(userId: string) {
   }
 }
 
-export async function getOfferings() {
-  if (!initialized) return [];
+// Call after the user authenticates to associate their purchases with their account.
+export async function loginUser(userId: string) {
+  if (!initialized) return;
+  try {
+    await Purchases.logIn(userId);
+  } catch (error) {
+    console.error('[RevenueCat] Failed to log in user:', error);
+  }
+}
+
+export async function getOfferings(): Promise<Offering | null> {
+  if (!initialized) {
+    console.warn('[RevenueCat] getOfferings() called before initialization');
+    return null;
+  }
   const offerings = await Purchases.getOfferings();
-  return offerings.current?.availablePackages ?? [];
+  console.log('[RevenueCat] getOfferings result:', {
+    current: offerings.current?.identifier ?? null,
+    allOfferings: Object.keys(offerings.all ?? {}),
+    packages: offerings.current?.availablePackages.map((p) => ({
+      id: p.identifier,
+      type: p.packageType,
+      price: p.product.priceString,
+    })) ?? [],
+  });
+  return offerings.current ?? null;
+}
+
+export function getOfferingMetadata<T>(offering: Offering, key: string, fallback: T): T {
+  if (!offering.metadata) return fallback;
+  const val = offering.metadata[key];
+  return (val as T) ?? fallback;
 }
 
 export async function purchasePackage(packageId: string): Promise<boolean> {

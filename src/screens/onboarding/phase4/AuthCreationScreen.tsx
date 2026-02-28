@@ -27,7 +27,7 @@ export default function AuthCreationScreen() {
 
         try {
             await signUp(email, password, name);
-            navigation.navigate('SetQuitDate');
+            navigation.navigate('PaywallTrialIntro');
         } catch (e: any) {
             Alert.alert('Error', e.message || 'Registration failed');
         }
@@ -36,7 +36,7 @@ export default function AuthCreationScreen() {
     const handleAppleSignIn = async () => {
         try {
             await signInWithApple();
-            navigation.navigate('SetQuitDate');
+            navigation.navigate('PaywallTrialIntro');
         } catch (e: any) {
             Alert.alert('Error', e.message || 'Apple sign-in failed');
         }
@@ -45,7 +45,7 @@ export default function AuthCreationScreen() {
     const handleGoogleSignIn = async () => {
         try {
             await signInWithGoogle();
-            navigation.navigate('SetQuitDate');
+            navigation.navigate('PaywallTrialIntro');
         } catch (e: any) {
             Alert.alert('Error', e.message || 'Google sign-in failed');
         }
@@ -54,11 +54,11 @@ export default function AuthCreationScreen() {
     const handleDevSignIn = async () => {
         try {
             await signIn(DEV_EMAIL, DEV_PASSWORD);
-            navigation.navigate('SetQuitDate');
+            navigation.navigate('PaywallTrialIntro');
         } catch {
             try {
                 await signUp(DEV_EMAIL, DEV_PASSWORD, 'Test User');
-                navigation.navigate('SetQuitDate');
+                navigation.navigate('PaywallTrialIntro');
             } catch (error: any) {
                 Alert.alert('Dev Sign In Failed', error.message ?? 'Something went wrong.');
             }

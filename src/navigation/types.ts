@@ -27,7 +27,10 @@ export type OnboardingStackParamList = {
   // Phase 4: Commitment & Paywall
   SetQuitDate: undefined;
   FinalPledge: undefined;
+  PaywallTrialIntro: undefined;
+  PaywallInsights: undefined;
   Paywall: undefined;
+  PaymentFailed: { message?: string };
 };
 
 export type TabParamList = {

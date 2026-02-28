@@ -18,6 +18,9 @@ import QuizWhyScreen from '@/src/screens/onboarding/phase2/QuizWhyScreen';
 
 // Phase 3
 import PersonalizedResultsScreen from '@/src/screens/onboarding/phase3/PersonalizedResultsScreen';
+import PaywallTrialIntroScreen from '@/src/screens/onboarding/phase3/PaywallTrialIntroScreen';
+import PaywallInsightsScreen from '@/src/screens/onboarding/phase3/PaywallInsightsScreen';
+import PaymentFailedScreen from '@/src/screens/onboarding/phase3/PaymentFailedScreen';
 
 // Phase 4
 import AuthCreationScreen from '@/src/screens/onboarding/phase4/AuthCreationScreen';
@@ -62,7 +65,10 @@ export function OnboardingNavigator() {
       {/* Phase 4: Commitment & Paywall */}
       <Stack.Screen name="SetQuitDate" component={SetQuitDateScreen} />
       <Stack.Screen name="FinalPledge" component={FinalPledgeScreen} />
+      <Stack.Screen name="PaywallTrialIntro" component={PaywallTrialIntroScreen} options={{ animation: 'slide_from_right' }} />
+      <Stack.Screen name="PaywallInsights" component={PaywallInsightsScreen} options={{ animation: 'slide_from_right' }} />
       <Stack.Screen name="Paywall" component={PaywallScreen} />
+      <Stack.Screen name="PaymentFailed" component={PaymentFailedScreen} options={{ animation: 'slide_from_bottom' }} />
     </Stack.Navigator>
   );
 }

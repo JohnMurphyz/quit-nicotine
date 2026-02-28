@@ -82,7 +82,7 @@ export default function FinalPledgeScreen() {
 
             <Animated.View entering={FadeInUp.duration(600).delay(1500)} className="w-full">
                 <Pressable
-                    onPress={() => navigation.navigate('Paywall')}
+                    onPress={() => navigation.navigate('PaywallTrialIntro')}
                     disabled={!hasSigned}
                     className={`w-full h-14 rounded-2xl items-center justify-center shadow-lg ${
                         hasSigned ? 'bg-white active:opacity-80' : 'bg-white/20'
