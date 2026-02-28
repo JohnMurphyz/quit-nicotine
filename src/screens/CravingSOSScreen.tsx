@@ -5,6 +5,7 @@ import { getBenefitsForMotivations } from '@/src/constants/benefits';
 import { useThemeColors } from '@/src/hooks/useThemeColors';
 import { useAuthStore } from '@/src/stores/authStore';
 import { useCravingStore } from '@/src/stores/cravingStore';
+import { useOnboardingStore } from '@/src/stores/onboardingStore';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { differenceInDays } from 'date-fns';
@@ -21,18 +22,42 @@ const TIPS = [
   { icon: 'musical-notes-outline', text: 'Put on a song you know all the words to' },
 ];
 
+// Maps trigger keys to preferred tip indices (ordered by relevance)
+const TRIGGER_TIPS: Record<string, number[]> = {
+  stress:     [4, 3, 0], // stress ball, exercise, water
+  boredom:    [1, 5, 2], // change environment, music, message someone
+  social:     [2, 1, 0], // message someone, change environment, water
+  after_meal: [0, 1, 3], // water, walk, exercise
+  morning:    [3, 0, 1], // exercise, water, change environment
+  driving:    [5, 0, 2], // music, water, message someone
+  coffee:     [1, 2, 3], // change environment, message someone, exercise
+  before_bed: [5, 1, 4], // music, change environment, stress ball
+};
+
 export default function CravingSOSScreen() {
   const navigation = useNavigation();
   const colors = useThemeColors();
   const { user, profile } = useAuthStore();
   const { cravings, logCraving, markResisted } = useCravingStore();
+  const onboardingTriggers = useOnboardingStore((s) => s.triggers);
 
   const [seconds, setSeconds] = useState(0);
   const [sosCravingId, setSosCravingId] = useState<string | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval>>(undefined);
 
-  // Pick ONE random grounding tip to show on this session to avoid list paralysis
-  const activeTip = useMemo(() => TIPS[Math.floor(Math.random() * TIPS.length)], []);
+  // Pick ONE grounding tip — trigger-aware if the user has triggers set, otherwise random
+  const activeTip = useMemo(() => {
+    const userTriggers = (profile?.triggers && profile.triggers.length > 0)
+      ? profile.triggers
+      : onboardingTriggers;
+    for (const trigger of userTriggers) {
+      const preferred = TRIGGER_TIPS[trigger];
+      if (preferred && preferred.length > 0) {
+        return TIPS[preferred[0]];
+      }
+    }
+    return TIPS[Math.floor(Math.random() * TIPS.length)];
+  }, [profile?.triggers, onboardingTriggers]);
 
   // Fetch the user's primary reason for quitting
   const primaryGoal = useMemo(() => {

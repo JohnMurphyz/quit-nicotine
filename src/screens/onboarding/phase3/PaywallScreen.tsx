@@ -12,6 +12,7 @@ import Animated, { FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
+import { AnimatedSkyBackground } from '@/src/components/AnimatedSkyBackground';
 import type { PurchasesPackage } from 'react-native-purchases';
 import { PACKAGE_TYPE } from 'react-native-purchases';
 
@@ -121,6 +122,7 @@ export default function PaywallScreen() {
                 motivations,
                 specific_benefit: specificBenefit,
                 readiness_level: readinessLevel,
+                triggers: useOnboardingStore.getState().triggers,
             });
         } catch (e) {
             console.error('Failed to complete onboarding:', e);
@@ -214,7 +216,7 @@ export default function PaywallScreen() {
         : null;
 
     return (
-        <View className="flex-1 bg-dark-900">
+        <AnimatedSkyBackground><View className="flex-1">
             <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 16 }}>
                 {/* Hero image — full bleed */}
                 <View style={{ height: 240, marginTop: -10 }}>
@@ -421,6 +423,6 @@ export default function PaywallScreen() {
                     </View>
                 </Animated.View>
             </SafeAreaView>
-        </View>
+        </View></AnimatedSkyBackground>
     );
 }

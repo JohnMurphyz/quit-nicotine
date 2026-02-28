@@ -28,7 +28,7 @@ export function BenefitSelectorModal({ visible, onClose, initialSelections }: Be
   const handleSave = async () => {
     setSaving(true);
     try {
-      await updateProfile({ motivations: selected });
+      await updateProfile({ motivations: selected, goals_explicitly_set: true });
       onClose();
     } finally {
       setSaving(false);

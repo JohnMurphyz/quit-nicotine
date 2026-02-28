@@ -84,46 +84,11 @@ export default function TimelineScreen() {
   const trackedSymptoms = profile?.tracked_symptoms ?? [];
   const hasSymptoms = trackedSymptoms.length > 0;
 
-  if (!profile?.quit_date) {
-    return (
-      <AnimatedSkyBackground>
-        <SafeAreaView className="flex-1" edges={['top']}>
-          <View className="flex-1 items-center justify-center px-8">
-            <Text style={{ fontSize: 20, fontWeight: '700', color: colors.textPrimary, textAlign: 'center', marginBottom: 8 }}>
-              Set your quit date to see your progress
-            </Text>
-            <Text style={{ fontSize: 16, color: colors.textMuted, textAlign: 'center' }}>
-              Head to Profile to set your quit date and track your recovery
-              journey.
-            </Text>
-          </View>
-        </SafeAreaView>
-      </AnimatedSkyBackground>
-    );
-  }
-
-  const quitDate = new Date(profile.quit_date);
+  // Derived time values — safe fallbacks when quit_date is null so hooks are always called
   const now = new Date();
-  const minutesSinceQuit = differenceInMinutes(now, quitDate);
-  const daysFree = Math.max(0, differenceInCalendarDays(now, quitDate));
-
-  // Compute percentage toward next milestone
-  const nextMilestoneIdx = MILESTONES.findIndex(
-    (m) => minutesSinceQuit < m.minutes,
-  );
-  let percentage: number;
-  let nextMilestoneLabel: string | undefined;
-
-  if (nextMilestoneIdx === -1) {
-    percentage = 100;
-  } else if (nextMilestoneIdx === 0) {
-    percentage = (minutesSinceQuit / MILESTONES[0].minutes) * 100;
-    nextMilestoneLabel = MILESTONES[0].label;
-  } else {
-    const next = MILESTONES[nextMilestoneIdx];
-    percentage = (minutesSinceQuit / next.minutes) * 100;
-    nextMilestoneLabel = next.label;
-  }
+  const quitDate = profile?.quit_date ? new Date(profile.quit_date) : null;
+  const minutesSinceQuit = quitDate ? differenceInMinutes(now, quitDate) : 0;
+  const daysFree = quitDate ? Math.max(0, differenceInCalendarDays(now, quitDate)) : 0;
 
   // Next incomplete goal (closest to completion first)
   const nextGoal = useMemo(() => {
@@ -144,6 +109,42 @@ export default function TimelineScreen() {
       .sort((a, b) => a.recoveryDays - b.recoveryDays);
     return incomplete[0] ?? null;
   }, [trackedSymptoms, hasSymptoms, daysFree]);
+
+  if (!profile?.quit_date) {
+    return (
+      <AnimatedSkyBackground>
+        <SafeAreaView className="flex-1" edges={['top']}>
+          <View className="flex-1 items-center justify-center px-8">
+            <Text style={{ fontSize: 20, fontWeight: '700', color: colors.textPrimary, textAlign: 'center', marginBottom: 8 }}>
+              Set your quit date to see your progress
+            </Text>
+            <Text style={{ fontSize: 16, color: colors.textMuted, textAlign: 'center' }}>
+              Head to Profile to set your quit date and track your recovery
+              journey.
+            </Text>
+          </View>
+        </SafeAreaView>
+      </AnimatedSkyBackground>
+    );
+  }
+
+  // Compute percentage toward next milestone
+  const nextMilestoneIdx = MILESTONES.findIndex(
+    (m) => minutesSinceQuit < m.minutes,
+  );
+  let percentage: number;
+  let nextMilestoneLabel: string | undefined;
+
+  if (nextMilestoneIdx === -1) {
+    percentage = 100;
+  } else if (nextMilestoneIdx === 0) {
+    percentage = (minutesSinceQuit / MILESTONES[0].minutes) * 100;
+    nextMilestoneLabel = MILESTONES[0].label;
+  } else {
+    const next = MILESTONES[nextMilestoneIdx];
+    percentage = (minutesSinceQuit / next.minutes) * 100;
+    nextMilestoneLabel = next.label;
+  }
 
   const nextItem = activeTab === 'goals' ? nextGoal : nextSymptom;
   const nextItemDays = nextItem

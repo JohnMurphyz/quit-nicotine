@@ -1,4 +1,5 @@
 import type { OnboardingStackParamList } from '@/src/navigation/types';
+import { AnimatedSkyBackground } from '@/src/components/AnimatedSkyBackground';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -11,7 +12,7 @@ export default function PaywallTrialIntroScreen() {
     const navigation = useNavigation<NativeStackNavigationProp<OnboardingStackParamList>>();
 
     return (
-        <View className="flex-1 bg-[#0f0d2e]">
+        <AnimatedSkyBackground><View className="flex-1">
             {/* Hero image — full bleed */}
             <View style={{ height: 280 }}>
                 <Image
@@ -100,6 +101,6 @@ export default function PaywallTrialIntroScreen() {
                     </SafeAreaView>
                 </Animated.View>
             </View>
-        </View>
+        </View></AnimatedSkyBackground>
     );
 }

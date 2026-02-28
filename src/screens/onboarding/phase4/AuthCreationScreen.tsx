@@ -38,6 +38,7 @@ export default function AuthCreationScreen() {
             await signInWithApple();
             navigation.navigate('PaywallTrialIntro');
         } catch (e: any) {
+            if (e?.cancelled) return; // user dismissed sheet — stay on screen silently
             Alert.alert('Error', e.message || 'Apple sign-in failed');
         }
     };
@@ -47,6 +48,7 @@ export default function AuthCreationScreen() {
             await signInWithGoogle();
             navigation.navigate('PaywallTrialIntro');
         } catch (e: any) {
+            if (e?.cancelled) return; // user dismissed sheet — stay on screen silently
             Alert.alert('Error', e.message || 'Google sign-in failed');
         }
     };

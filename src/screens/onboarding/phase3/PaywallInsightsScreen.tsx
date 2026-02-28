@@ -1,4 +1,5 @@
 import type { OnboardingStackParamList } from '@/src/navigation/types';
+import { AnimatedSkyBackground } from '@/src/components/AnimatedSkyBackground';
 import { useOnboardingStore } from '@/src/stores/onboardingStore';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
@@ -29,7 +30,7 @@ export default function PaywallInsightsScreen() {
     const substance = nicotineType ?? 'nicotine';
 
     return (
-        <View className="flex-1 bg-[#0f0d2e]">
+        <AnimatedSkyBackground><View className="flex-1">
             <SafeAreaView className="flex-1 px-6 pt-4" edges={['top']}>
                 {/* Back button */}
                 <Animated.View entering={FadeInUp.duration(600).delay(0)}>
@@ -165,6 +166,6 @@ export default function PaywallInsightsScreen() {
                     </SafeAreaView>
                 </Animated.View>
             </SafeAreaView>
-        </View>
+        </View></AnimatedSkyBackground>
     );
 }

@@ -111,12 +111,23 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   signInWithApple: async () => {
     set({ loading: true });
     try {
-      const credential = await AppleAuthentication.signInAsync({
-        requestedScopes: [
-          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
-          AppleAuthentication.AppleAuthenticationScope.EMAIL,
-        ],
-      });
+      let credential;
+      try {
+        credential = await AppleAuthentication.signInAsync({
+          requestedScopes: [
+            AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+            AppleAuthentication.AppleAuthenticationScope.EMAIL,
+          ],
+        });
+      } catch (e: any) {
+        // User dismissed the Apple sheet — signal silently
+        if (e?.code === 'ERR_REQUEST_CANCELED') {
+          const cancelled: any = new Error('cancelled');
+          cancelled.cancelled = true;
+          throw cancelled;
+        }
+        throw e;
+      }
 
       if (!credential.identityToken) {
         throw new Error('No identity token returned from Apple.');
@@ -142,7 +153,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       });
 
       const response = await GoogleSignin.signIn();
-      if (response.type !== 'success') return;
+      if (response.type !== 'success') {
+        // User dismissed the Google sheet — signal silently
+        const cancelled: any = new Error('cancelled');
+        cancelled.cancelled = true;
+        throw cancelled;
+      }
 
       // Use getTokens() to get a fresh ID token without nonce issues
       const { idToken } = await GoogleSignin.getTokens();

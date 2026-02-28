@@ -42,6 +42,8 @@ export interface Profile {
   specific_benefit: string | null;
   support_person: string | null;
   avatar_url: string | null;
+  goals_explicitly_set: boolean;
+  triggers: string[] | null;
   onboarding_completed: boolean;
   created_at: string;
   updated_at: string;

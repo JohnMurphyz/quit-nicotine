@@ -28,7 +28,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { differenceInDays, differenceInHours, differenceInMinutes } from 'date-fns';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import { Alert, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, { Easing, FadeInDown, LinearTransition } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -39,7 +39,7 @@ type Nav = CompositeNavigationProp<
 
 export default function HomeScreen() {
   const navigation = useNavigation<Nav>();
-  const { profile } = useAuthStore();
+  const { profile, updateProfile } = useAuthStore();
   const { streak, confirming, confirmToday, confirmations } = useStreak();
   const { logCraving, logging } = useCravings();
   const { isCheckInDue, recordCheckIn, resetCheckIn } = useCheckInInterval();
@@ -56,9 +56,12 @@ export default function HomeScreen() {
   const [streakCelebrationVisible, setStreakCelebrationVisible] = useState(false);
   const [celebrationStreak, setCelebrationStreak] = useState(0);
   const [relapseModalVisible, setRelapseModalVisible] = useState(false);
+  const [quitCelebrationVisible, setQuitCelebrationVisible] = useState(false);
 
   const motivations = profile?.motivations ?? [];
   const trackedSymptoms = profile?.tracked_symptoms ?? [];
+
+  const hasQuitDeclared = !!profile?.quit_date;
 
   const alreadyPledged = !isCheckInDue;
 
@@ -178,21 +181,61 @@ export default function HomeScreen() {
             </View>
           </Animated.View>
 
-          {/* Action buttons */}
-          <Animated.View entering={FadeInDown.delay(400).duration(600).easing(Easing.out(Easing.cubic))}>
-            <ActionButtonRow buttons={actionButtons} />
-          </Animated.View>
+          {/* Action buttons / Quit declaration */}
+          {hasQuitDeclared ? (
+            <>
+              <Animated.View entering={FadeInDown.delay(400).duration(600).easing(Easing.out(Easing.cubic))}>
+                <ActionButtonRow buttons={actionButtons} />
+              </Animated.View>
 
-          {/* Panic Button */}
-          <Animated.View entering={FadeInDown.delay(500).duration(600).easing(Easing.out(Easing.cubic))}>
-            <Pressable
-              onPress={() => navigation.navigate('CravingSOS')}
-              style={{ marginHorizontal: 16, marginTop: 8, backgroundColor: '#ef4444', borderRadius: 16, padding: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}
-            >
-              <Ionicons name="alert-circle" size={22} color="white" />
-              <Text style={{ color: 'white', fontWeight: '700', fontSize: 17 }}>Panic Button</Text>
-            </Pressable>
-          </Animated.View>
+              {/* Panic Button */}
+              <Animated.View entering={FadeInDown.delay(500).duration(600).easing(Easing.out(Easing.cubic))}>
+                <Pressable
+                  onPress={() => navigation.navigate('CravingSOS')}
+                  style={{ marginHorizontal: 16, marginTop: 8, backgroundColor: '#ef4444', borderRadius: 16, padding: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+                >
+                  <Ionicons name="alert-circle" size={22} color="white" />
+                  <Text style={{ color: 'white', fontWeight: '700', fontSize: 17 }}>Panic Button</Text>
+                </Pressable>
+              </Animated.View>
+            </>
+          ) : (
+            <Animated.View entering={FadeInDown.delay(400).duration(600).easing(Easing.out(Easing.cubic))}>
+              <View
+                style={{
+                  marginHorizontal: 16,
+                  marginTop: 8,
+                  borderRadius: 20,
+                  borderWidth: 1,
+                  borderColor: colors.isDark ? 'rgba(160,150,220,0.25)' : colors.borderColor,
+                  backgroundColor: colors.isDark ? 'rgba(160,150,220,0.08)' : colors.cardBg,
+                  padding: 20,
+                  gap: 12,
+                }}
+              >
+                <Text style={{ fontSize: 16, fontWeight: '700', color: colors.textPrimary, textAlign: 'center' }}>
+                  You've decided to quit{profile?.nicotine_type ? ` ${profile.nicotine_type}` : ''}. Ready to make it official and start your clock?
+                </Text>
+                {profile?.specific_benefit ? (
+                  <Text style={{ fontSize: 14, color: colors.textSecondary, textAlign: 'center' }}>
+                    For your {profile.specific_benefit}.
+                  </Text>
+                ) : null}
+                <Pressable
+                  onPress={() => setQuitCelebrationVisible(true)}
+                  style={{
+                    backgroundColor: colors.tabBarActive,
+                    borderRadius: 14,
+                    paddingVertical: 16,
+                    alignItems: 'center',
+                    marginTop: 4,
+                  }}
+                >
+                  <Text style={{ color: 'white', fontWeight: '800', fontSize: 17 }}>I've Quit Today</Text>
+                </Pressable>
+              </View>
+            </Animated.View>
+          )}
 
           {/* To-do checklist */}
           {profile && (
@@ -271,6 +314,51 @@ export default function HomeScreen() {
           onClose={() => setRelapseModalVisible(false)}
           onReset={resetCheckIn}
         />
+
+        <Modal
+          visible={quitCelebrationVisible}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setQuitCelebrationVisible(false)}
+        >
+          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 }}>
+            <Animated.View entering={FadeInDown.duration(400)} style={{
+              backgroundColor: colors.isDark ? '#1a1745' : '#faf7f4',
+              borderRadius: 28,
+              padding: 32,
+              alignItems: 'center',
+              width: '100%',
+              borderWidth: 1,
+              borderColor: colors.isDark ? 'rgba(160,150,220,0.2)' : colors.borderColor,
+            }}>
+              <Text style={{ fontSize: 64, marginBottom: 16 }}>👣</Text>
+              <Text style={{ fontSize: 24, fontWeight: '800', color: colors.textPrimary, textAlign: 'center', marginBottom: 12 }}>
+                Congratulations!
+              </Text>
+              <Text style={{ fontSize: 16, color: colors.textSecondary, textAlign: 'center', lineHeight: 24, marginBottom: 28 }}>
+                You've taken the first step in a long journey. Every great distance begins right here.
+              </Text>
+              <Pressable
+                onPress={() => {
+                  setQuitCelebrationVisible(false);
+                  updateProfile({ quit_date: new Date().toISOString() });
+                }}
+                style={{
+                  backgroundColor: colors.tabBarActive,
+                  borderRadius: 16,
+                  paddingVertical: 16,
+                  paddingHorizontal: 40,
+                  width: '100%',
+                  alignItems: 'center',
+                }}
+              >
+                <Text style={{ color: colors.isDark ? '#1a1745' : 'white', fontWeight: '800', fontSize: 17 }}>
+                  Continue
+                </Text>
+              </Pressable>
+            </Animated.View>
+          </View>
+        </Modal>
       </SafeAreaView>
     </AnimatedSkyBackground>
   );

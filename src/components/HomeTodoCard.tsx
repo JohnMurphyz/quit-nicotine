@@ -48,7 +48,7 @@ export function HomeTodoCard({
       icon: 'trophy-outline',
       title: 'Set recovery goals',
       description: 'Choose what motivates you',
-      complete: (profile.motivations ?? []).length > 0,
+      complete: profile.goals_explicitly_set === true,
       onPress: onSetGoals,
     },
     {
